@@ -16,6 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from proyects.views import get_all_proyects_web, upload_data_excel
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('proyectos/upload_data/', upload_data_excel, name="departamentos_upload"),
+    path('proyectos/get_all_proyects_web/', get_all_proyects_web, name="get_all_proyects_web"),
+
+
 ]
