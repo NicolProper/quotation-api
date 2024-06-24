@@ -1,0 +1,6 @@
+.env
+myenv
+# Elastic Beanstalk Files
+__pycache__
+.editorconfig
+.vscode
