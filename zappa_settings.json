@@ -20,10 +20,10 @@
     },
     "develop": {
         "aws_region": "us-east-2",
-        "django_settings": "marketplace_api.settings",
-        "project_name": "marketplace_api",
+        "django_settings": "quotation_api.settings",
+        "project_name": "quotation_api",
         "runtime": "python3.9",
-        "s3_bucket": "zappa-web-project",
+        "s3_bucket": "zappa-quotation-api",
         "slim_handler": true,
         "exclude": [
             "boto3",
