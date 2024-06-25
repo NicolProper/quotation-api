@@ -404,7 +404,7 @@ def calcular_van(pago_periodico, tasa_interes, valor_presente):
     
     return van
 
-def calculate_cell_value(cell_value, dataIngresos, plazo):
+def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
     constants = [
                     [ 'bcp', 'ibk', 'bbva', 'pichincha', 'banbif', 'scotiabank'],
                     [ 1, 0.2, 1, 1, 1, 1],
@@ -434,7 +434,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo):
              print("ingreso", ingreso)
              data[cell_value]-= float(ingreso)
 
-    tasa_mensual = 0.09 / 12
+    tasa_mensual = tasa / 12
 
     
     cuota_mensual = -npf.pv(rate=tasa_mensual, nper=plazo, pmt=data[cell_value])
@@ -472,7 +472,8 @@ def get_score_crediticio(request):
             cuota_personal=data.get('cuota_personal')
             cuota_tarjeta_credito=data.get('cuota_tarjeta_credito')
             cuota_inicial=data.get('cuota_inicial')
-            residencia=data.get('residencia')
+            tasa=data.get('tasa')
+
             total_deudas=0
             
             print(00)
@@ -499,12 +500,12 @@ def get_score_crediticio(request):
             ]
       
             
-            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses)
-            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses)
-            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses)
-            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses)
-            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses)
-            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses)
+            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa)
+            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa)
+            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa)
+            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa)
+            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa)
+            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa)
             
             
             context = [
