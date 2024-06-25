@@ -1,9 +1,6 @@
-from base64 import b64decode
 import datetime
 import json
-import math
 import numpy_financial as npf
-
 from django.http import HttpResponse, JsonResponse
 from .models import Departamento
 from .serializers import DepartamentoSerializer
@@ -17,12 +14,8 @@ from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from .filters import DepartamentoFilter
-from rest_framework.decorators import action
 import xlwings as xw
 from rest_framework.viewsets import ModelViewSet
-from django.db.models import Min, F
-from django.conf import settings  # Importa la configuración de Django
-from googleapiclient.discovery import build
 class DepartamentoViewSet(generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
