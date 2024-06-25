@@ -1,17 +1,12 @@
-from argparse import Action
 from base64 import b64decode
 import datetime
-from io import BytesIO
 import json
 import math
 import numpy_financial as npf
 
-import os
 from django.http import HttpResponse, JsonResponse
-import numpy as np
 from .models import Departamento
 from .serializers import DepartamentoSerializer
-from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -27,9 +22,7 @@ import xlwings as xw
 from rest_framework.viewsets import ModelViewSet
 from django.db.models import Min, F
 from django.conf import settings  # Importa la configuración de Django
-from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from google.oauth2 import service_account
 class DepartamentoViewSet(generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
