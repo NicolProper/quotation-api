@@ -710,7 +710,8 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
         "nro_banos": departamento.nro_banos,
         "url": "https://proyects-image.s3.us-east-2.amazonaws.com/" + departamento.proyecto.slug + "/tipologias/" + departamento.tipo_departamento.upper() + ".jpg",
         
-        
+        "nro_depa": departamento.nro_depa,
+
         "corretaje": 'si' if departamento.proyecto.corretaje else "no",
         "tasa_int_credito_hip_porc": tasa*100 ,#update
         "descuento_preventa_porc": departamento.proyecto.descuento_porcentaje_preventa*100,
