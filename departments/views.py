@@ -443,8 +443,8 @@ def get_score_crediticio(request):
             data = json.loads(data_)
 
             
-            nombre_completo= data.get('nombre_completo')
-            DNI=data.get('DNI')
+            nombre= data.get('nombre_completo')
+            dni=data.get('dni')
             edad=data.get('edad')
             residencia= data.get('residencia') #Perú , Extranjero
             ingreso_primera_categoria=data.get('ingreso_primera_categoria')
@@ -513,7 +513,7 @@ def get_score_crediticio(request):
             resultado_final=getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value)                 
             print(resultadoDepartamentos)
                         
-            return JsonResponse({ "size":len(resultado_final), "data":resultado_final}, safe=False)
+            return JsonResponse({ "size":len(resultado_final),"bancos":context , "data":resultado_final}, safe=False)
         except Exception as e:
             print(f'Error: {e}')
             return Response({'message': 'Error en el procesamiento'}, status=400)
@@ -643,7 +643,8 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                                 "precio": depa.precio_venta,
                                 "bono": BONO,
                                 "monto_inicial": MONTO_INICAL,
-                                "monto_financiado": MONTO_FINANCIADO
+                                "monto_financiado": MONTO_FINANCIADO,
+                                "id": depa.id
                             })
                          
                             print(resu[proyecto.banco])
@@ -660,7 +661,9 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                             "precio": depa.precio_venta,
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
-                            "monto_financiado": MONTO_FINANCIADO
+                            "monto_financiado": MONTO_FINANCIADO,
+                            "id": depa.id
+
                         })
                         
                             print(depa)

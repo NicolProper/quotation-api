@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'proyects',
-    "departments"
+    "departments",
+    "usuario"
 ]
 
 MIDDLEWARE = [

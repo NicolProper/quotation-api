@@ -19,6 +19,7 @@ from departments import views as departamentos_views
 from proyects import views as proyectos_views
 
 from proyects.views import get_all_proyects_web
+from usuario.views import actualizar_usuario_view, buscar_usuario_por_dni, crear_usuario_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,7 +28,12 @@ urlpatterns = [
     path('departamentos/upload_data/', departamentos_views.upload_data_excel, name="departamentos_upload"),
     path('departamentos/update_all_data/', departamentos_views.update_all_data, name="update_all_data"),
     path('departamentos/get_score_crediticio/', departamentos_views.get_score_crediticio, name='get_score_crediticio'),
+    path('usuarios/crear/', crear_usuario_view, name='crear_usuario'),
+    path('usuarios/actualizar/<uuid:pk>/', actualizar_usuario_view, name='actualizar-usuario'),
+    path('usuarios/buscar/<str:dni>/', buscar_usuario_por_dni, name='buscar_usuario_por_dni'),
 
     path('', include("departments.urls")),
+    path('', include("usuario.urls")),
+
     path('', include("proyects.urls")),
 ]
