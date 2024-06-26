@@ -2,6 +2,8 @@ import datetime
 import json
 import numpy_financial as npf
 from django.http import HttpResponse, JsonResponse
+
+from usuario.models import User
 from .models import Departamento
 from .serializers import DepartamentoSerializer
 from rest_framework import permissions
@@ -15,6 +17,8 @@ from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from .filters import DepartamentoFilter
 import xlwings as xw
+from datetime import date, timedelta
+
 from rest_framework.viewsets import ModelViewSet
 class DepartamentoViewSet(generics.ListAPIView):
     """
@@ -669,3 +673,58 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                             print(depa)
                             
             return resultadoDepartamentos
+        
+        
+@api_view(['GET'])
+def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa):
+    print('ingrese')
+    departamento = Departamento.objects.get(id=idDepartamento)
+    cliente=User.objects.get(id=idCliente)
+    print(cliente.cuota_inicial)
+    print(departamento.precio_venta)
+    print(departamento.proyecto.valor_porcentaje_inicial)
+   
+    departamento_data = {
+        "proyecto": departamento.proyecto.nombre.upper() +" / Tipo: "+ departamento.tipo_departamento,
+        "etapa":  departamento.proyecto.etapa,
+        "tipologia":  departamento.tipo_departamento,
+        "numero_depa":  departamento.nombre,
+        "valor_inmueble": departamento.precio_venta, #update
+        "tipo_moneda": departamento.tipo_moneda,
+        "inicial_porc": cliente.cuota_inicial*100/departamento.precio_venta, #update
+        "fecha_entrega":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
+        "alcabala": 'no',
+        "apreciacion_anual_porc": 2,
+        "costo_administracion_porc": 0,
+        "meses_de_gracia": 0,
+        "renta_mensual": departamento.valor_alquiler,
+        "seguro_desgravamen_mensual_porc": 0.0281,
+        "meses_dobles": {
+            "mes1": "-1",
+            "mes2": "-1"
+        },
+        "seguro_todo_riesgo_mensual_porc": 0.02,
+        "fecha_del_prestamo":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
+        "tamanio_m2":departamento.unit_area,
+        "nro_habitaciones": departamento.nro_dormitorios,
+        "nro_banos": departamento.nro_banos,
+        "url": "https://proyects-image.s3.us-east-2.amazonaws.com/" + departamento.proyecto.slug + "/tipologias/" + departamento.tipo_departamento.upper() + ".jpg",
+        
+        
+        "corretaje": 'si' if departamento.proyecto.corretaje else "no",
+        "tasa_int_credito_hip_porc": tasa*100 ,#update
+        "descuento_preventa_porc": departamento.proyecto.descuento_porcentaje_preventa*100,
+        "plazo_en_meses_cred_hip": getPlazoMese(cliente.edad, cliente.primera_vivienda), #update
+        "costo_instalar_porc": departamento.proyecto.costo_porcentaje_instalacion*100,
+        "capex_reparaciones_anual_porc": departamento.proyecto.costo_porcentaje_capex_reparaciones*100,
+        "vacancia_dias_anio": departamento.proyecto.dias_vacancia,
+        "costo_operacional_prom_porc":departamento.proyecto.costo_porcentaje_operativo*100,
+        "costo_de_administracion_porc":departamento.proyecto.costo_porcentaje_administrativo*100,
+        "costos_administrativos_venta_porc":departamento.proyecto.costo_porcentaje_administrativos_venta*100
+
+        }
+        # departamentos_data.append(departamento_data)
+    
+    # Devolver los departamentos como JSON
+    return Response({'data': departamento_data})
+    
