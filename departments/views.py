@@ -726,6 +726,10 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
         "plazo_en_meses_cred_hip": getPlazoMese(cliente.edad, cliente.primera_vivienda), #update
         "costo_instalar_porc": departamento.proyecto.costo_porcentaje_instalacion*100,
         "capex_reparaciones_anual_porc": departamento.proyecto.costo_porcentaje_capex_reparaciones*100,
+        "vista": departamento.vista,
+        "piso": departamento.piso,
+
+
         "vacancia_dias_anio": departamento.proyecto.dias_vacancia,
         "costo_operacional_prom_porc":departamento.proyecto.costo_porcentaje_operativo*100,
         "costo_de_administracion_porc":departamento.proyecto.costo_porcentaje_administrativo*100,
