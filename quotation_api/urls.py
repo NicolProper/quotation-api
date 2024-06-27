@@ -1,33 +1,36 @@
-"""quotation_api URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, register_converter
 from departments import views as departamentos_views
 from proyects import views as proyectos_views
-
 from proyects.views import get_all_proyects_web
+from usuario.views import actualizar_usuario_view, buscar_usuario_por_dni, crear_usuario_view
 
+# Definir el convertidor de float
+class FloatConverter:
+    regex = r'\d+(\.\d+)?'
+
+    def to_python(self, value):
+        return float(value)
+
+    def to_url(self, value):
+        return str(value)
+
+# Registrar el convertidor de float
+register_converter(FloatConverter, 'float')
+
+# Definir las URL patterns
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('proyectos/upload_data/', proyectos_views.upload_data_excel, name="departamentos_upload"),
+    path('proyectos/upload_data/', proyectos_views.upload_data_excel, name="proyectos_upload"),
     path('proyectos/get_all_proyects_web/', get_all_proyects_web, name="get_all_proyects_web"),
     path('departamentos/upload_data/', departamentos_views.upload_data_excel, name="departamentos_upload"),
     path('departamentos/update_all_data/', departamentos_views.update_all_data, name="update_all_data"),
+    path('departamentos/info_departamento_proyecto_analyzer/<int:idDepartamento>/<uuid:idCliente>/<float:tasa>/', departamentos_views.info_departamento_proyecto_analyzer, name="info_departamento_proyecto"),
     path('departamentos/get_score_crediticio/', departamentos_views.get_score_crediticio, name='get_score_crediticio'),
-
+    path('usuarios/crear/', crear_usuario_view, name='crear_usuario'),
+    path('usuarios/actualizar/<uuid:pk>/', actualizar_usuario_view, name='actualizar-usuario'),
+    path('usuarios/buscar/<str:dni>/', buscar_usuario_por_dni, name='buscar_usuario_por_dni'),
     path('', include("departments.urls")),
+    path('', include("usuario.urls")),
     path('', include("proyects.urls")),
 ]

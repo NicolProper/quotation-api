@@ -1,17 +1,11 @@
-from argparse import Action
-from base64 import b64decode
 import datetime
-from io import BytesIO
 import json
-import math
 import numpy_financial as npf
-
-import os
 from django.http import HttpResponse, JsonResponse
-import numpy as np
+
+from usuario.models import User
 from .models import Departamento
 from .serializers import DepartamentoSerializer
-from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -22,14 +16,10 @@ from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from .filters import DepartamentoFilter
-from rest_framework.decorators import action
 import xlwings as xw
+from datetime import date, timedelta
+
 from rest_framework.viewsets import ModelViewSet
-from django.db.models import Min, F
-from django.conf import settings  # Importa la configuración de Django
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from google.oauth2 import service_account
 class DepartamentoViewSet(generics.ListAPIView):
     """
     API endpoint that allows users to be viewed or edited.
@@ -457,8 +447,8 @@ def get_score_crediticio(request):
             data = json.loads(data_)
 
             
-            nombre_completo= data.get('nombre_completo')
-            DNI=data.get('DNI')
+            nombre= data.get('nombre_completo')
+            dni=data.get('dni')
             edad=data.get('edad')
             residencia= data.get('residencia') #Perú , Extranjero
             ingreso_primera_categoria=data.get('ingreso_primera_categoria')
@@ -482,7 +472,8 @@ def get_score_crediticio(request):
             ingreso_solo_tercera_categoria= getIngresoSoloTerceraCategoria(ingreso_primera_categoria, ingreso_segunda_categoria,ingreso_tercera_categoria , ingreso_cuarta_categoria,ingreso_quinta_categoria)
             
             # TOTAL DEUDAS
-            total_deudas=total_deudas + cuota_hipotecaria + cuota_vehicular+cuota_personal + cuota_tarjeta_credito
+            total_deudas=total_deudas + cuota_hipotecaria 
+            # + cuota_vehicular+cuota_personal + cuota_tarjeta_credito
                
             # EDAD
             plazo_meses= getPlazoMese(edad, primera_vivienda)
@@ -527,7 +518,7 @@ def get_score_crediticio(request):
             resultado_final=getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value)                 
             print(resultadoDepartamentos)
                         
-            return JsonResponse({ "size":len(resultado_final), "data":resultado_final}, safe=False)
+            return JsonResponse({ "size":len(resultado_final),"bancos":context , "data":resultado_final}, safe=False)
         except Exception as e:
             print(f'Error: {e}')
             return Response({'message': 'Error en el procesamiento'}, status=400)
@@ -629,7 +620,7 @@ def getBono(precio, tipo_moneda, primera_vivienda):
 
 
 def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value):
-            proyectos = Proyecto.objects.filter(web=True, slug="canada")
+            proyectos = Proyecto.objects.filter(web=True)
 
             for proyecto in proyectos:
                 
@@ -657,7 +648,8 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                                 "precio": depa.precio_venta,
                                 "bono": BONO,
                                 "monto_inicial": MONTO_INICAL,
-                                "monto_financiado": MONTO_FINANCIADO
+                                "monto_financiado": MONTO_FINANCIADO,
+                                "id": depa.id
                             })
                          
                             print(resu[proyecto.banco])
@@ -674,9 +666,67 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                             "precio": depa.precio_venta,
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
-                            "monto_financiado": MONTO_FINANCIADO
+                            "monto_financiado": MONTO_FINANCIADO,
+                            "id": depa.id
+
                         })
                         
                             print(depa)
                             
             return resultadoDepartamentos
+        
+        
+@api_view(['GET'])
+def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa):
+    print('ingrese')
+    departamento = Departamento.objects.get(id=idDepartamento)
+    cliente=User.objects.get(id=idCliente)
+    print(cliente.cuota_inicial)
+    print(departamento.precio_venta)
+    print(departamento.proyecto.valor_porcentaje_inicial)
+   
+    departamento_data = {
+        "proyecto": departamento.proyecto.nombre.upper() +" / Tipo: "+ departamento.tipo_departamento,
+        "etapa":  departamento.proyecto.etapa,
+        "tipologia":  departamento.tipo_departamento,
+        "numero_depa":  departamento.nombre,
+        "valor_inmueble": departamento.precio_venta, #update
+        "tipo_moneda": departamento.tipo_moneda,
+        "inicial_porc": departamento.proyecto.valor_porcentaje_inicial*100, #update
+        "fecha_entrega":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
+        "alcabala": 'no',
+        "apreciacion_anual_porc": 2,
+        "costo_administracion_porc": 0,
+        "meses_de_gracia": 0,
+        "renta_mensual": departamento.valor_alquiler,
+        "seguro_desgravamen_mensual_porc": 0.0281,
+        "meses_dobles": {
+            "mes1": "-1",
+            "mes2": "-1"
+        },
+        "seguro_todo_riesgo_mensual_porc": 0.02,
+        "fecha_del_prestamo":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
+        "tamanio_m2":departamento.unit_area,
+        "nro_habitaciones": departamento.nro_dormitorios,
+        "nro_banos": departamento.nro_banos,
+        "url": "https://proyects-image.s3.us-east-2.amazonaws.com/" + departamento.proyecto.slug + "/tipologias/" + departamento.tipo_departamento.upper() + ".jpg",
+        
+        "nro_depa": departamento.nro_depa,
+
+        "corretaje": 'si' if departamento.proyecto.corretaje else "no",
+        "tasa_int_credito_hip_porc": tasa*100 ,#update
+        "descuento_preventa_porc": departamento.proyecto.descuento_porcentaje_preventa*100,
+        "plazo_en_meses_cred_hip": getPlazoMese(cliente.edad, cliente.primera_vivienda), #update
+        "costo_instalar_porc": departamento.proyecto.costo_porcentaje_instalacion*100,
+        "capex_reparaciones_anual_porc": departamento.proyecto.costo_porcentaje_capex_reparaciones*100,
+        "vacancia_dias_anio": departamento.proyecto.dias_vacancia,
+        "costo_operacional_prom_porc":departamento.proyecto.costo_porcentaje_operativo*100,
+        "costo_de_administracion_porc":departamento.proyecto.costo_porcentaje_administrativo*100,
+        "costos_administrativos_venta_porc":departamento.proyecto.costo_porcentaje_administrativos_venta*100
+
+        }
+        # departamentos_data.append(departamento_data)
+    
+    # Devolver los departamentos como JSON
+    return Response({'data': departamento_data})
+    
