@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ra@6#@-i180&p6ep^6jilfvp&mo#sc7@e-l@98r!))#oe3iutg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1","98jz8fku6f.execute-api.us-east-2.amazonaws.com", "ta1fvfcr52.execute-api.us-east-2.amazonaws.com"]
+ALLOWED_HOSTS = [    "http://localhost:3000","localhost", "127.0.0.1","98jz8fku6f.execute-api.us-east-2.amazonaws.com", "ta1fvfcr52.execute-api.us-east-2.amazonaws.com"]
 
 
 # Application definition
@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
+
     'django_filters',
     'proyects',
     "departments",
@@ -54,6 +56,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
 ]
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 ROOT_URLCONF = 'quotation_api.urls'
 
