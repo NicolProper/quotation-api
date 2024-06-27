@@ -648,6 +648,8 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                                 "proyecto":proyecto.nombre,
                                 "precio": depa.precio_venta,
                                 "tipo_moneda": depa.tipo_moneda,
+                                "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
+
                                 "bono": BONO,
                                 "monto_inicial": MONTO_INICAL,
                                 "monto_financiado": MONTO_FINANCIADO,
@@ -667,6 +669,7 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                             "proyecto":proyecto.nombre,
                             "precio": depa.precio_venta,
                             "tipo_moneda": depa.tipo_moneda,
+                            "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
 
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
