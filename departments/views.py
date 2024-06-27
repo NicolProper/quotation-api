@@ -692,7 +692,7 @@ def getFecha(depa:Departamento):
     if depa.proyecto.etapa=="inmediata":
         return date.today().replace(day=1)
 
-    elif  depa.proyecto.etapa=="planos" or depa.proyecto.etapa=="construccion":
+    elif  depa.proyecto.etapa=="planos" or depa.proyecto.etapa=="construccion" or depa.proyecto.etapa=="preventa":
         return depa.proyecto.fecha_entrega - relativedelta(months=1)
     
     else:
