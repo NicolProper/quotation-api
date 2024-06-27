@@ -472,7 +472,8 @@ def get_score_crediticio(request):
             ingreso_solo_tercera_categoria= getIngresoSoloTerceraCategoria(ingreso_primera_categoria, ingreso_segunda_categoria,ingreso_tercera_categoria , ingreso_cuarta_categoria,ingreso_quinta_categoria)
             
             # TOTAL DEUDAS
-            total_deudas=total_deudas + cuota_hipotecaria + cuota_vehicular+cuota_personal + cuota_tarjeta_credito
+            total_deudas=total_deudas + cuota_hipotecaria 
+            # + cuota_vehicular+cuota_personal + cuota_tarjeta_credito
                
             # EDAD
             plazo_meses= getPlazoMese(edad, primera_vivienda)
