@@ -42,9 +42,9 @@ def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, in
 
 
 
+
+
 # usuario/views.py
-
-
 @api_view(['POST'])
 def crear_usuario_view(request):
     if request.method == 'POST':

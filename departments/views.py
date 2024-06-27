@@ -2,6 +2,7 @@ import datetime
 import json
 import numpy_financial as npf
 from django.http import HttpResponse, JsonResponse
+from dateutil.relativedelta import relativedelta
 
 from usuario.models import User
 from .models import Departamento
@@ -683,6 +684,21 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
             return resultadoDepartamentos
         
         
+        
+def getFecha(depa:Departamento):
+    fecha_actual = date.today()
+
+    nueva_fecha = fecha_actual - relativedelta(months=1)
+    
+    if depa.proyecto.etapa=="inmediata":
+        return date.today()
+
+    elif  depa.proyecto.etapa=="planos" or depa.proyecto.etapa=="construccion":
+        return nueva_fecha
+    
+    else:
+        return depa.proyecto.fecha_entrega
+    
 @api_view(['GET'])
 def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa):
     print('ingrese')
@@ -691,7 +707,9 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
     print(cliente.cuota_inicial)
     print(departamento.precio_venta)
     print(departamento.proyecto.valor_porcentaje_inicial)
-   
+   # Obtener la fecha actual
+
+    
     departamento_data = {
         "proyecto": departamento.proyecto.nombre.upper() +" / Tipo: "+ departamento.tipo_departamento,
         "etapa":  departamento.proyecto.etapa,
@@ -712,7 +730,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
             "mes2": "-1"
         },
         "seguro_todo_riesgo_mensual_porc": 0.02,
-        "fecha_del_prestamo":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
+        "fecha_del_prestamo": getFecha(departamento),
         "tamanio_m2":departamento.unit_area,
         "nro_habitaciones": departamento.nro_dormitorios,
         "nro_banos": departamento.nro_banos,
