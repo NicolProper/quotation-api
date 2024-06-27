@@ -686,15 +686,14 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
         
         
 def getFecha(depa:Departamento):
-    fecha_actual = date.today()
 
-    nueva_fecha = fecha_actual - relativedelta(months=1)
+    # nueva_fecha = fecha_actual - relativedelta(months=1)
     
     if depa.proyecto.etapa=="inmediata":
-        return date.today()
+        return date.today().replace(day=1)
 
     elif  depa.proyecto.etapa=="planos" or depa.proyecto.etapa=="construccion":
-        return nueva_fecha
+        return depa.proyecto.fecha_entrega - relativedelta(months=1)
     
     else:
         return depa.proyecto.fecha_entrega
@@ -718,7 +717,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
         "valor_inmueble":departamento.precio_venta if departamento.tipo_moneda=="pen" else departamento.precio_venta*3.8, #update
         "tipo_moneda": departamento.tipo_moneda,
         "inicial_porc": departamento.proyecto.valor_porcentaje_inicial*100, #update
-        "fecha_entrega":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
+        "fecha_entrega":  date.today().replace(day=1)  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
         "alcabala": 'no',
         "apreciacion_anual_porc": 2,
         "costo_administracion_porc": 0,
