@@ -1,5 +1,8 @@
 import json
+import os
+from urllib.request import Request
 from django.shortcuts import render
+from httplib2 import Credentials
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
@@ -106,3 +109,46 @@ def buscar_usuario_por_dni(request, dni):
     
     # Devolver la respuesta con los datos serializados del usuario
     return JsonResponse({"data":serializer.data, "mensaje": "Usuario encontrado"}, status=200)
+
+
+
+
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+
+# def get_gmail_service():
+#     creds = None
+#     token_path = os.path.join('token.json')
+
+#     if os.path.exists(token_path):
+#         creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+#     if not creds or not creds.valid:
+#         if creds and creds.expired and creds.refresh_token:
+#             creds.refresh(Request())
+#         else:
+#             flow = InstalledAppFlow.from_client_secrets_file(
+#                 os.path.join('credentials.json'), SCOPES)
+#             creds = flow.run_local_server(port=0)
+#         with open(token_path, 'w') as token:
+#             token.write(creds.to_json())
+
+#     try:
+#         service = build('gmail', 'v1', credentials=creds)
+#         return service
+#     except HttpError as error:
+#         print(f'An error occurred: {error}')
+#         return None
+
+# def send_email(service, sender, to, subject, message_text):
+#     message = MIMEText(message_text)
+#     message['to'] = to
+#     message['from'] = sender
+#     message['subject'] = subject
+#     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+#     body = {'raw': raw_message}
+#     try:
+#         message = service.users().messages().send(userId='me', body=body).execute()
+#         print(f'Message Id: {message["id"]}')
+#         return message
+#     except HttpError as error:
+#         print(f'An error occurred: {error}')
+#         return None
