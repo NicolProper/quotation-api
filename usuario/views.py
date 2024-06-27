@@ -1,16 +1,16 @@
 import json
 import os
-from urllib.request import Request
-from django.shortcuts import render
-from httplib2 import Credentials
-from rest_framework.viewsets import ModelViewSet
+# from urllib.request import Request
+# from django.shortcuts import render
+# from httplib2 import Credentials
+# from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import permissions
 from rest_framework import viewsets
 from usuario.models import User
 from usuario.serializers import UsuarioSerializer
-from django.shortcuts import render
+# from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 
