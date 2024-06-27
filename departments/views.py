@@ -692,7 +692,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
         "numero_depa":  departamento.nombre,
         "valor_inmueble": departamento.precio_venta, #update
         "tipo_moneda": departamento.tipo_moneda,
-        "inicial_porc": cliente.cuota_inicial*100/departamento.precio_venta, #update
+        "inicial_porc": departamento.proyecto.valor_porcentaje_inicial*100, #update
         "fecha_entrega":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
         "alcabala": 'no',
         "apreciacion_anual_porc": 2,
