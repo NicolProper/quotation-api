@@ -428,6 +428,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
 
     
     cuota_mensual = -npf.pv(rate=tasa_mensual, nper=plazo, pmt=data[cell_value])
+    real_value=  cuota_mensual if  cuota_mensual > 0 else 0
 # return vpn
         
             
@@ -435,7 +436,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
     print(cuota_mensual)
     
 
-    return {cell_value:cuota_mensual}
+    return {cell_value:real_value}
     
 @api_view(['POST'])
 def get_score_crediticio(request):
