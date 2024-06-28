@@ -623,7 +623,7 @@ def getBono(precio, tipo_moneda, primera_vivienda):
 
 def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value):
             proyectos = Proyecto.objects.filter(web=True)
-
+            print(proyectos)
             for proyecto in proyectos:
                 
                 

@@ -4,6 +4,8 @@ import json
 # from django.shortcuts import render
 # from httplib2 import Credentials
 # from rest_framework.viewsets import ModelViewSet
+from django.forms import model_to_dict
+from fastapi import Response
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import permissions
@@ -40,25 +42,19 @@ def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, in
 
     return nuevo_usuario
 
-@api_view(['POST'])
-def actualizar_usuario(dni, datos_actualizacion):
-    if dni is None:
-        raise ValueError("El DNI es obligatorio para identificar al usuario.")
-    
-    # Verificar si ya existe un usuario con el mismo DNI
-    usuario_existente = User.objects.filter(dni=dni).first()
-    
-    if usuario_existente is None:
-        raise ValueError("No existe un usuario con este DNI.")
-    
-    # Actualizar los campos del usuario existente según los datos proporcionados
-    for campo, valor in datos_actualizacion.items():
-        if hasattr(usuario_existente, campo):
-            setattr(usuario_existente, campo, valor)
-    
-    usuario_existente.save()
-    
-    return usuario_existente
+# @api_view(['POST'])
+# def actualizar_usuario(request, dni):
+#     try:
+#         usuario = User.objects.get(dni=dni)
+#     except User.DoesNotExist:
+#         return Response({"error": "El usuario no existe"}, status=)
+
+#     # Aquí procesas la actualización del usuario con los datos recibidos en la solicitud
+#     serializer = UserSerializer(usuario, data=request.data, partial=True)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -97,23 +93,45 @@ def crear_usuario_view(request):
 
 
 @api_view(['PUT'])  # Utilizamos PUT para actualizaciones
-def actualizar_usuario_view(request, pk):
+def actualizar_usuario_view(request, dni):
     try:
-        usuario = User.objects.get(pk=pk)
+        usuario = User.objects.filter(dni=dni).first()
+        print(usuario)
     except User.DoesNotExist:
         return JsonResponse({'mensaje': 'El usuario no existe'}, status=404)
-
-    # Si el usuario existe, intentamos actualizarlo
-    data = request.data  # Utilizamos request.data para obtener los datos del cuerpo de la solicitud
-
+    data_str = request.body
+    data = json.loads(data_str)
+    print(data)
     # Serializamos el usuario existente con los datos actualizados
     serializer = UsuarioSerializer(usuario, data=data)
-    
-    if serializer.is_valid():
-        serializer.save()  # Guardamos los datos actualizados en la base de datos
-        return JsonResponse(serializer.data, status=200)
-    
-    return JsonResponse(serializer.errors, status=400)
+    print(serializer)
+    # Actualiza los campos del usuario según los datos recibidos
+    for key, value in data.items():
+        setattr(usuario, key, value)
+
+    # Guarda los cambios en la base de datos
+    usuario.save()
+
+    model = {
+        "id":usuario.id,
+        "nombre": usuario.nombre,
+        "apellido": usuario.apellido,
+        "dni": usuario.dni,
+        "edad": int(usuario.edad),
+        "residencia": usuario.residencia,
+        "ingreso_primera_categoria": float(usuario.ingreso_primera_categoria),
+        "ingreso_segunda_categoria": float(usuario.ingreso_segunda_categoria),
+        "ingreso_tercera_categoria": float(usuario.ingreso_tercera_categoria),
+        "ingreso_cuarta_categoria":float(usuario.ingreso_cuarta_categoria),
+        "ingreso_quinta_categoria": float(usuario.ingreso_quinta_categoria),
+        "primera_vivienda": usuario.primera_vivienda,
+        "cuota_hipotecaria": float(usuario.cuota_hipotecaria),
+        "cuota_vehicular": float(usuario.cuota_vehicular),
+        "cuota_personal": float(usuario.cuota_personal),
+        "cuota_tarjeta_credito": float(usuario.cuota_tarjeta_credito),
+        "cuota_inicial": float(usuario.cuota_inicial)
+    }
+    return JsonResponse({'mensaje': 'Usuario actualizado correctamente', "data":model}, status=200)
 
 
 @api_view(['GET'])
