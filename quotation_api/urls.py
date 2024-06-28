@@ -3,7 +3,7 @@ from django.urls import include, path, register_converter
 from departments import views as departamentos_views
 from proyects import views as proyectos_views
 from proyects.views import get_all_proyects_web
-from usuario.views import actualizar_usuario_view, buscar_usuario_por_dni, crear_usuario_view
+from usuario.views import actualizar_usuario, actualizar_usuario_view, buscar_usuario_por_dni, crear_usuario_view
 
 # Definir el convertidor de float
 class FloatConverter:
@@ -30,6 +30,8 @@ urlpatterns = [
     path('usuarios/crear/', crear_usuario_view, name='crear_usuario'),
     path('usuarios/actualizar/<uuid:pk>/', actualizar_usuario_view, name='actualizar-usuario'),
     path('usuarios/buscar/<str:dni>/', buscar_usuario_por_dni, name='buscar_usuario_por_dni'),
+    path('usuarios/actualizar/<str:dni>/', actualizar_usuario, name='actualizar_usuario'),
+
     path('', include("departments.urls")),
     path('', include("usuario.urls")),
     path('', include("proyects.urls")),

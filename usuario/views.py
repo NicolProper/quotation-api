@@ -40,6 +40,25 @@ def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, in
 
     return nuevo_usuario
 
+@api_view(['POST'])
+def actualizar_usuario(dni, datos_actualizacion):
+    if dni is None:
+        raise ValueError("El DNI es obligatorio para identificar al usuario.")
+    
+    # Verificar si ya existe un usuario con el mismo DNI
+    usuario_existente = User.objects.filter(dni=dni).first()
+    
+    if usuario_existente is None:
+        raise ValueError("No existe un usuario con este DNI.")
+    
+    # Actualizar los campos del usuario existente según los datos proporcionados
+    for campo, valor in datos_actualizacion.items():
+        if hasattr(usuario_existente, campo):
+            setattr(usuario_existente, campo, valor)
+    
+    usuario_existente.save()
+    
+    return usuario_existente
 
 
 
@@ -100,7 +119,7 @@ def actualizar_usuario_view(request, pk):
 @api_view(['GET'])
 def buscar_usuario_por_dni(request, dni):
     try:
-        usuario = User.objects.get(dni=int(dni))  # Buscar usuario por DNI
+        usuario = User.objects.get(dni=dni)  # Buscar usuario por DNI
     except User.DoesNotExist:
         return JsonResponse({'mensaje': 'Usuario no encontrado'}, status=404)
 

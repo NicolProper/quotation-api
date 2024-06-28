@@ -9,8 +9,7 @@ class User(models.Model):
 
     nombre = models.CharField(max_length=200)
     apellido =models.CharField(max_length=200)
-    
-    dni = models.IntegerField(null=False,  default=0)
+    dni = models.CharField(max_length=20, null=False)
     edad = models.IntegerField(null=False,  default=0)
 
 
