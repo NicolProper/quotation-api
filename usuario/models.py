@@ -6,11 +6,9 @@ from django.dispatch import receiver
 
 class User(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     nombre = models.CharField(max_length=200)
     apellido =models.CharField(max_length=200)
-    
-    dni = models.IntegerField(null=False,  default=0)
+    dni = models.CharField(max_length=20, null=False)
     edad = models.IntegerField(null=False,  default=0)
 
 
@@ -57,6 +55,6 @@ class User(models.Model):
 
     # Also could be a slug to static url
     def __str__(self):
-        return self.DNI
+        return self.dni
     
     

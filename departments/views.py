@@ -2,6 +2,7 @@ import datetime
 import json
 import numpy_financial as npf
 from django.http import HttpResponse, JsonResponse
+from dateutil.relativedelta import relativedelta
 
 from usuario.models import User
 from .models import Departamento
@@ -428,6 +429,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
 
     
     cuota_mensual = -npf.pv(rate=tasa_mensual, nper=plazo, pmt=data[cell_value])
+    real_value=  cuota_mensual if  cuota_mensual > 0 else 0
 # return vpn
         
             
@@ -435,7 +437,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
     print(cuota_mensual)
     
 
-    return {cell_value:cuota_mensual}
+    return {cell_value:real_value}
     
 @api_view(['POST'])
 def get_score_crediticio(request):
@@ -621,7 +623,7 @@ def getBono(precio, tipo_moneda, primera_vivienda):
 
 def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value):
             proyectos = Proyecto.objects.filter(web=True)
-
+            print(proyectos)
             for proyecto in proyectos:
                 
                 
@@ -646,6 +648,9 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                                 "nro_depa":depa.nro_depa,
                                 "proyecto":proyecto.nombre,
                                 "precio": depa.precio_venta,
+                                "tipo_moneda": depa.tipo_moneda,
+                                "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
+
                                 "bono": BONO,
                                 "monto_inicial": MONTO_INICAL,
                                 "monto_financiado": MONTO_FINANCIADO,
@@ -664,6 +669,9 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
                             "nro_depa":depa.nro_depa,
                             "proyecto":proyecto.nombre,
                             "precio": depa.precio_venta,
+                            "tipo_moneda": depa.tipo_moneda,
+                            "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
+
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
                             "monto_financiado": MONTO_FINANCIADO,
@@ -676,6 +684,20 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
             return resultadoDepartamentos
         
         
+        
+def getFecha(depa:Departamento):
+
+    # nueva_fecha = fecha_actual - relativedelta(months=1)
+    
+    if depa.proyecto.etapa=="inmediata":
+        return date.today().replace(day=1)
+
+    elif  depa.proyecto.etapa=="planos" or depa.proyecto.etapa=="construccion" or depa.proyecto.etapa=="preventa":
+        return depa.proyecto.fecha_entrega - relativedelta(months=1)
+    
+    else:
+        return depa.proyecto.fecha_entrega
+    
 @api_view(['GET'])
 def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa):
     print('ingrese')
@@ -684,16 +706,18 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
     print(cliente.cuota_inicial)
     print(departamento.precio_venta)
     print(departamento.proyecto.valor_porcentaje_inicial)
-   
+   # Obtener la fecha actual
+
+    
     departamento_data = {
         "proyecto": departamento.proyecto.nombre.upper() +" / Tipo: "+ departamento.tipo_departamento,
         "etapa":  departamento.proyecto.etapa,
         "tipologia":  departamento.tipo_departamento,
         "numero_depa":  departamento.nombre,
-        "valor_inmueble": departamento.precio_venta, #update
+        "valor_inmueble":departamento.precio_venta if departamento.tipo_moneda=="pen" else departamento.precio_venta*3.8, #update
         "tipo_moneda": departamento.tipo_moneda,
         "inicial_porc": departamento.proyecto.valor_porcentaje_inicial*100, #update
-        "fecha_entrega":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
+        "fecha_entrega":  date.today().replace(day=1)  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
         "alcabala": 'no',
         "apreciacion_anual_porc": 2,
         "costo_administracion_porc": 0,
@@ -705,7 +729,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
             "mes2": "-1"
         },
         "seguro_todo_riesgo_mensual_porc": 0.02,
-        "fecha_del_prestamo":  date.today()  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
+        "fecha_del_prestamo": getFecha(departamento),
         "tamanio_m2":departamento.unit_area,
         "nro_habitaciones": departamento.nro_dormitorios,
         "nro_banos": departamento.nro_banos,
@@ -719,6 +743,10 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
         "plazo_en_meses_cred_hip": getPlazoMese(cliente.edad, cliente.primera_vivienda), #update
         "costo_instalar_porc": departamento.proyecto.costo_porcentaje_instalacion*100,
         "capex_reparaciones_anual_porc": departamento.proyecto.costo_porcentaje_capex_reparaciones*100,
+        "vista": departamento.vista,
+        "piso": departamento.piso,
+
+
         "vacancia_dias_anio": departamento.proyecto.dias_vacancia,
         "costo_operacional_prom_porc":departamento.proyecto.costo_porcentaje_operativo*100,
         "costo_de_administracion_porc":departamento.proyecto.costo_porcentaje_administrativo*100,

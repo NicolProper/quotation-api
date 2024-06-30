@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ra@6#@-i180&p6ep^6jilfvp&mo#sc7@e-l@98r!))#oe3iutg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1","98jz8fku6f.execute-api.us-east-2.amazonaws.com", "ta1fvfcr52.execute-api.us-east-2.amazonaws.com"]
+ALLOWED_HOSTS = [    "http://localhost:3000","localhost", "127.0.0.1","98jz8fku6f.execute-api.us-east-2.amazonaws.com", "ta1fvfcr52.execute-api.us-east-2.amazonaws.com"]
 
 
 # Application definition
@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
+
     'django_filters',
     'proyects',
     "departments",
@@ -54,6 +56,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
 ]
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 ROOT_URLCONF = 'quotation_api.urls'
 
@@ -82,7 +86,7 @@ WSGI_APPLICATION = 'quotation_api.wsgi.application'
 DATABASES = {
    'default':{
 		'ENGINE': "django.db.backends.postgresql_psycopg2",
-         'NAME':'workshop',
+         'NAME':'proper',
          'USER':'postgres',
          'PASSWORD':'nicolproper',
          'HOST':'workshop-data.c1qek8c4yrtg.us-east-2.rds.amazonaws.com',
@@ -156,3 +160,16 @@ CORS_ALLOW_HEADERS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+GOOGLE_API_CREDENTIALS = os.path.join(BASE_DIR, 'credentials.json')
+
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'  # Cambia esto a la región correcta
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'AKIAQ3EGUNUPEUPV7CUO'
+EMAIL_HOST_PASSWORD = "BBkoH7tjDCwhnF3janHIJen1b7DTJuNSBMdR4XwVlIcN"
