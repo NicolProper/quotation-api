@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'quotation_api.wsgi.application'
 DATABASES = {
    'default':{
 		'ENGINE': "django.db.backends.postgresql_psycopg2",
-         'NAME':'workshop',
+         'NAME':'proper',
          'USER':'postgres',
          'PASSWORD':'nicolproper',
          'HOST':'workshop-data.c1qek8c4yrtg.us-east-2.rds.amazonaws.com',
@@ -165,3 +165,11 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 GOOGLE_API_CREDENTIALS = os.path.join(BASE_DIR, 'credentials.json')
+
+# settings.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'  # Cambia esto a la región correcta
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'AKIAQ3EGUNUPEUPV7CUO'
+EMAIL_HOST_PASSWORD = "BBkoH7tjDCwhnF3janHIJen1b7DTJuNSBMdR4XwVlIcN"

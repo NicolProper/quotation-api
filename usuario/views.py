@@ -1,11 +1,5 @@
 import json
-# import os
-# from urllib.request import Request
-# from django.shortcuts import render
-# from httplib2 import Credentials
-# from rest_framework.viewsets import ModelViewSet
-from django.forms import model_to_dict
-from fastapi import Response
+
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import permissions
@@ -15,6 +9,7 @@ from usuario.serializers import UsuarioSerializer
 # from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
+from django.core.mail import EmailMultiAlternatives
 
 
 # Create your views here.
@@ -189,3 +184,38 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 #     except HttpError as error:
 #         print(f'An error occurred: {error}')
 #         return None
+
+@api_view(['POST'])
+def send_email_with_attachments(request):
+    if request.method == 'POST':
+        try:
+            # Obtener datos del formulario
+            subject = request.POST.get('subject')
+            message = request.POST.get('message')
+            from_email = "nicole.mendoza@proper.com.pe"
+            to_email = "nicolmendozamattos@gmail.com"
+            attachments = request.FILES.getlist('attachments')  # Obtener una lista de archivos adjuntos
+
+            # Validar que todos los parámetros necesarios estén presentes
+            if subject and message and from_email and to_email and attachments:
+                try:
+                    # Configurar el correo electrónico
+                    email = EmailMultiAlternatives(subject, message, from_email, [to_email])
+                    email.attach_alternative(message, "text/html")  # Agregar mensaje en formato HTML si es necesario
+                    
+                    # Adjuntar archivos
+                    for attachment in attachments:
+                        email.attach(attachment.name, attachment.read(), attachment.content_type)
+                    
+                    # Enviar el correo electrónico
+                    email.send()
+                    
+                    return JsonResponse({'message': 'Correo con adjuntos enviado exitosamente!'})
+                except Exception as e:
+                    return JsonResponse({'error': str(e)}, status=500)
+            else:
+                return JsonResponse({'error': 'Faltan parámetros.'}, status=400)
+        except KeyError:
+            return JsonResponse({'error': 'No se proporcionaron los archivos adjuntos.'}, status=400)
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
