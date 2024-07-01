@@ -13,6 +13,10 @@
             "numpy",
             "torch"
         ],
+        "memory_size": 1024,
+        "ephemeral_storage": {
+            "Size": 2048
+        },
         "aws_environment_variables": {
             "STAGE": "production",
             "PROJECT": "quotation-api"
@@ -32,6 +36,10 @@
             "numpy",
             "torch"
         ],
+        "memory_size": 1024,
+        "ephemeral_storage": {
+            "Size": 2048
+        },
         "aws_environment_variables": {
             "STAGE": "develop",
             "PROJECT": "quotation-api"
