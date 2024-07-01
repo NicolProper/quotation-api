@@ -467,20 +467,22 @@ def get_score_crediticio(request):
             cuota_tarjeta_credito=data.get('cuota_tarjeta_credito')
             cuota_inicial=data.get('cuota_inicial')
             tasa=data.get('tasa')
+            plazo_meses=data.get('plazo_meses')
+            valor_porcentaje_inicial= data.get('valor_porcentaje_inicial')
 
             total_deudas=0
             
             print(00)
            
             #¿INGRESO SOLO 3ER CATEGORIA?        
-            ingreso_solo_tercera_categoria= getIngresoSoloTerceraCategoria(ingreso_primera_categoria, ingreso_segunda_categoria,ingreso_tercera_categoria , ingreso_cuarta_categoria,ingreso_quinta_categoria)
+            # ingreso_solo_tercera_categoria= getIngresoSoloTerceraCategoria(ingreso_primera_categoria, ingreso_segunda_categoria,ingreso_tercera_categoria , ingreso_cuarta_categoria,ingreso_quinta_categoria)
             
             # TOTAL DEUDAS
             total_deudas=total_deudas + cuota_hipotecaria 
             # + cuota_vehicular+cuota_personal + cuota_tarjeta_credito
                
             # EDAD
-            plazo_meses= getPlazoMese(edad, primera_vivienda)
+            # plazo_meses= getPlazoMese(edad, primera_vivienda)
 
  
             dataIngresos=[
@@ -519,7 +521,8 @@ def get_score_crediticio(request):
             
             resultadoDepartamentos=[]
             
-            resultado_final=getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value)                 
+            # resultado_final=getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value)           
+            resultado_final= getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vivienda, cuota_inicial, context, min_value)
             print(resultadoDepartamentos)
                         
             return JsonResponse({ "size":len(resultado_final),"bancos":context , "data":resultado_final}, safe=False)
@@ -550,23 +553,23 @@ def getPlazoMese(edad, primera_vivienda):
 
 
 
-def getIngresoSoloTerceraCategoria(ingreso_primera_categoria, ingreso_segunda_categoria,ingreso_tercera_categoria , ingreso_cuarta_categoria,ingreso_quinta_categoria ):
+# def getIngresoSoloTerceraCategoria(ingreso_primera_categoria, ingreso_segunda_categoria,ingreso_tercera_categoria , ingreso_cuarta_categoria,ingreso_quinta_categoria ):
     
-    if ingreso_tercera_categoria > 0 and all(x == 0 for x in [ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria]):       
-        return "SI"  
+#     if ingreso_tercera_categoria > 0 and all(x == 0 for x in [ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria]):       
+#         return "SI"  
     
-    return "NO" 
+#     return "NO" 
 
 
 
 
-def getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,valor_porcentaje_inicial, primera_vivienda ):
-        if ingreso_solo_tercera_categoria=="SI" or residencia=="Extranjero":
-            return 0.3
-        elif primera_vivienda=="SÍ":
-            return 0.15
+# def getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,valor_porcentaje_inicial, primera_vivienda ):
+#         if ingreso_solo_tercera_categoria=="SI" or residencia=="Extranjero":
+#             return 0.3
+#         elif primera_vivienda=="NO":
+#             return 0.15
 
-        return valor_porcentaje_inicial
+#         return valor_porcentaje_inicial
 
 
 
@@ -625,14 +628,14 @@ def getBono(precio, tipo_moneda, primera_vivienda):
 
 
 
-def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value):
+def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vivienda, cuota_inicial, context, min_value):
             proyectos = Proyecto.objects.filter(web=True)
             print(proyectos)
             for proyecto in proyectos:
                 
                 
-                valor_porcentaje_inicial_real=getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,proyecto.valor_porcentaje_inicial , primera_vivienda)
-        
+                # valor_porcentaje_inicial_real=getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,proyecto.valor_porcentaje_inicial , primera_vivienda)
+                valor_porcentaje_inicial_real =valor_porcentaje_inicial if valor_porcentaje_inicial >= proyecto.valor_porcentaje_inicial else proyecto.valor_porcentaje_inicial
                 departamentos= Departamento.objects.filter(
                 proyecto_id=proyecto.id,
                 estatus="disponible")
@@ -703,7 +706,7 @@ def getFecha(depa:Departamento):
         return depa.proyecto.fecha_entrega
     
 @api_view(['GET'])
-def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa, plazoMeses):
+def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa, plazoMeses, porcentajeInicial):
     print('ingrese')
     departamento = Departamento.objects.get(id=idDepartamento)
     cliente=User.objects.get(id=idCliente)
@@ -720,7 +723,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa,
         "numero_depa":  departamento.nombre,
         "valor_inmueble":departamento.precio_venta if departamento.tipo_moneda=="pen" else departamento.precio_venta*3.8, #update
         "tipo_moneda": departamento.tipo_moneda,
-        "inicial_porc": departamento.proyecto.valor_porcentaje_inicial*100, #update
+        "inicial_porc": porcentajeInicial if porcentajeInicial >= departamento.proyecto.valor_porcentaje_inicial*100 else departamento.proyecto.valor_porcentaje_inicial*100 , #update
         "fecha_entrega":  date.today().replace(day=1)  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
         "alcabala": 'no',
         "apreciacion_anual_porc": 2,
