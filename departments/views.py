@@ -560,9 +560,11 @@ def getIngresoSoloTerceraCategoria(ingreso_primera_categoria, ingreso_segunda_ca
 
 
 
-def getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,valor_porcentaje_inicial ):
+def getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,valor_porcentaje_inicial, primera_vivienda ):
         if ingreso_solo_tercera_categoria=="SI" or residencia=="Extranjero":
             return 0.3
+        elif primera_vivienda=="SÍ":
+            return 0.15
 
         return valor_porcentaje_inicial
 
@@ -629,7 +631,7 @@ def getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,resi
             for proyecto in proyectos:
                 
                 
-                valor_porcentaje_inicial_real=getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,proyecto.valor_porcentaje_inicial )
+                valor_porcentaje_inicial_real=getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,proyecto.valor_porcentaje_inicial , primera_vivienda)
         
                 departamentos= Departamento.objects.filter(
                 proyecto_id=proyecto.id,
@@ -701,7 +703,7 @@ def getFecha(depa:Departamento):
         return depa.proyecto.fecha_entrega
     
 @api_view(['GET'])
-def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa):
+def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa, plazoMeses):
     print('ingrese')
     departamento = Departamento.objects.get(id=idDepartamento)
     cliente=User.objects.get(id=idCliente)
@@ -742,7 +744,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
         "corretaje": 'si' if departamento.proyecto.corretaje else "no",
         "tasa_int_credito_hip_porc": tasa*100 ,#update
         "descuento_preventa_porc": departamento.proyecto.descuento_porcentaje_preventa*100,
-        "plazo_en_meses_cred_hip": getPlazoMese(cliente.edad, cliente.primera_vivienda), #update
+        "plazo_en_meses_cred_hip": plazoMeses, #update
         "costo_instalar_porc": departamento.proyecto.costo_porcentaje_instalacion*100,
         "capex_reparaciones_anual_porc": departamento.proyecto.costo_porcentaje_capex_reparaciones*100,
         "vista": departamento.vista,

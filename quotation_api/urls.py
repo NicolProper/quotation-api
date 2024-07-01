@@ -27,7 +27,7 @@ urlpatterns = [
     path('departamentos/getAllDepartamentos/', departamentos_views.getAllDepas, name="departamentos_upload"),
 
     path('departamentos/update_all_data/', departamentos_views.update_all_data, name="update_all_data"),
-    path('departamentos/info_departamento_proyecto_analyzer/<int:idDepartamento>/<uuid:idCliente>/<float:tasa>/', departamentos_views.info_departamento_proyecto_analyzer, name="info_departamento_proyecto"),
+    path('departamentos/info_departamento_proyecto_analyzer/<int:idDepartamento>/<uuid:idCliente>/<float:tasa>/<int:plazoMeses>/', departamentos_views.info_departamento_proyecto_analyzer, name="info_departamento_proyecto"),
     path('departamentos/get_score_crediticio/', departamentos_views.get_score_crediticio, name='get_score_crediticio'),
     path('usuarios/crear/', crear_usuario_view, name='crear_usuario'),
     path('usuarios/actualizar/<str:dni>/', actualizar_usuario_view, name='actualizar-usuario'),
