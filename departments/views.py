@@ -19,7 +19,9 @@ from rest_framework.filters import OrderingFilter
 from .filters import DepartamentoFilter
 import xlwings as xw
 from datetime import date, timedelta
-
+from django.db.models import F, Case, When, FloatField, Value
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 class DepartamentoViewSet(generics.ListAPIView):
     """
@@ -758,3 +760,26 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa)
     # Devolver los departamentos como JSON
     return Response({'data': departamento_data})
     
+@api_view(['GET'])
+def getAllDepas(request):
+    Depas = (Departamento.objects
+             .filter(estatus="disponible")
+             .select_related('proyecto')
+             .annotate(
+                 proyecto_nombre=F('proyecto__nombre'),
+                 precio_real=Case(
+                     When(tipo_moneda="usd", then=F('precio_venta') * Value(3.8)),
+                     default=F('precio_venta'),
+                     output_field=FloatField()
+                 )
+             )
+             .values(
+                 'nro_depa',
+                 'proyecto_nombre',
+                 'precio_venta',
+                 'tipo_moneda',
+                 'precio_real',
+                 'id'
+             ))
+
+    return Response({'data': list(Depas)})
