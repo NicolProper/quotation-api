@@ -243,12 +243,15 @@ def send_email_with_attachments(request):
             # Obtener datos del formulario
             subject = data.get('subject')
             message = data.get('message')
-            from_email = "nicole.mendoza@proper.com.pe"
-            to_email = "nicolmendozamattos@gmail.com"
+            remitente= data.get('remitente')
+            destinatario= data.get('destinatario')
+
+            from_email = remitente
+            to_email = destinatario
             print(subject,message)
 
-            attachments = request.FILES.get('attachments')  # Obtener una lista de archivos adjuntos
-            print(request.FILES)
+            attachments = request.FILES.getlist('attachments')  # Obtener una lista de archivos adjuntos
+            print(attachments)
 
             # Validar que todos los parámetros necesarios estén presentes
             if subject and message and from_email and to_email and attachments:
@@ -262,10 +265,10 @@ def send_email_with_attachments(request):
                     # print(type(attachments))  # Asegúrate de que es una lista
                     # print(attachments)
                     # Adjuntar archivos
-                    for attachment in [attachments]:
-                        # print(attachment.content_type)  # Imprime los detalles de cada archivo
+                    for attachment in attachments:
+                        print(attachment)  # Imprime los detalles de cada archivo
                         email.attach(attachment.name, attachment.read(), attachment.content_type)
-                    print('ingrse_________3')
+                    # print('ingrse_________3')
 
                     # Enviar el correo electrónico
                     email.send()

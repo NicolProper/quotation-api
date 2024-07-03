@@ -723,6 +723,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa,
         "numero_depa":  departamento.nombre,
         "valor_inmueble":departamento.precio_venta if departamento.tipo_moneda=="pen" else departamento.precio_venta*3.8, #update
         "tipo_moneda": departamento.tipo_moneda,
+        "precio_lista": departamento.precio,
         "inicial_porc": porcentajeInicial if porcentajeInicial >= departamento.proyecto.valor_porcentaje_inicial*100 else departamento.proyecto.valor_porcentaje_inicial*100 , #update
         "fecha_entrega":  date.today().replace(day=1)  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
         "alcabala": 'no',
