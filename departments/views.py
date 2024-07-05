@@ -3,6 +3,7 @@ import json
 import numpy_financial as npf
 from django.http import HttpResponse, JsonResponse
 from dateutil.relativedelta import relativedelta
+from django.db.models import Q
 
 from usuario.models import User
 from .models import Departamento
@@ -650,7 +651,8 @@ def getBono(precio, tipo_moneda, primera_vivienda):
 
 
 def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vivienda, cuota_inicial, context, min_value):
-            proyectos = Proyecto.objects.filter(web=True)
+            proyectos = Proyecto.objects.filter(Q(web=True) | Q(nombre="parodi"))
+
             print(proyectos)
             for proyecto in proyectos:
                 
@@ -716,7 +718,8 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
         
 
 def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,primera_vivienda, cuota_inicial, context, min_value):
-            proyectos = Proyecto.objects.filter(web=True)
+            proyectos = Proyecto.objects.filter(Q(web=True) | Q(nombre="parodi"))
+
             print(proyectos)
             for proyecto in proyectos:
                 
