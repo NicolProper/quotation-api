@@ -26,13 +26,13 @@ class ProyectoViewSet(viewsets.ModelViewSet):
 
 from .models import User  # Asegúrate de importar el modelo correcto
 
-def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial):
+def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral):
     # Verificar si ya existe un usuario con el mismo DNI
     if User.objects.filter(dni=dni).exists():
         raise ValueError("Ya existe un usuario con este DNI.")
 
     # Crear un nuevo usuario
-    nuevo_usuario = User(nombre=nombre,apellido=apellido, dni=dni, cuota_hipotecaria=cuota_hipotecaria,  edad=edad, residencia=residencia, ingreso_primera_categoria=ingreso_primera_categoria, ingreso_segunda_categoria=ingreso_segunda_categoria, ingreso_tercera_categoria=ingreso_tercera_categoria, ingreso_cuarta_categoria=ingreso_cuarta_categoria, ingreso_quinta_categoria=ingreso_quinta_categoria, primera_vivienda=primera_vivienda, cuota_vehicular=cuota_vehicular, cuota_personal=cuota_personal, cuota_tarjeta_credito=cuota_tarjeta_credito, cuota_inicial=cuota_inicial)
+    nuevo_usuario = User(nombre=nombre,apellido=apellido, dni=dni, cuota_hipotecaria=cuota_hipotecaria,  edad=edad, residencia=residencia, ingreso_primera_categoria=ingreso_primera_categoria, ingreso_segunda_categoria=ingreso_segunda_categoria, ingreso_tercera_categoria=ingreso_tercera_categoria, ingreso_cuarta_categoria=ingreso_cuarta_categoria, ingreso_quinta_categoria=ingreso_quinta_categoria, primera_vivienda=primera_vivienda, cuota_vehicular=cuota_vehicular, cuota_personal=cuota_personal, cuota_tarjeta_credito=cuota_tarjeta_credito, cuota_inicial=cuota_inicial, continuidad_laboral=continuidad_laboral)
     nuevo_usuario.save()
 
     return nuevo_usuario
@@ -76,9 +76,10 @@ def crear_usuario_view(request):
         cuota_personal=data.get('cuota_personal')
         cuota_tarjeta_credito=data.get('cuota_tarjeta_credito')
         cuota_inicial=data.get('cuota_inicial')
+        continuidad_laboral=data.get('continuidad_laboral')
 
         try:
-            usuario_creado = crear_usuario(nombre,apellido, dni, cuota_hipotecaria, edad, residencia, ingreso_primera_categoria,ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria , ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial)
+            usuario_creado = crear_usuario(nombre,apellido, dni, cuota_hipotecaria, edad, residencia, ingreso_primera_categoria,ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria , ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral)
             return JsonResponse({'mensaje': 'Usuario creado exitosamente', 'id': usuario_creado.id}, status=201)
         except ValueError as e:
             return JsonResponse({'mensaje': str(e)}, status=201)
@@ -124,7 +125,9 @@ def actualizar_usuario_view(request, dni):
         "cuota_vehicular": float(usuario.cuota_vehicular),
         "cuota_personal": float(usuario.cuota_personal),
         "cuota_tarjeta_credito": float(usuario.cuota_tarjeta_credito),
-        "cuota_inicial": float(usuario.cuota_inicial)
+        "cuota_inicial": float(usuario.cuota_inicial),
+        "continuidad_laboral": int(usuario.continuidad_laboral)
+
     }
     return JsonResponse({'mensaje': 'Usuario actualizado correctamente', "data":model}, status=200)
 

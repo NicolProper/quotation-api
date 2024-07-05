@@ -397,7 +397,7 @@ def calcular_van(pago_periodico, tasa_interes, valor_presente):
     
     return van
 
-def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
+def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas):
     constants = [
                     [ 'bcp', 'ibk', 'bbva', 'pichincha', 'banbif', 'scotiabank'],
                     [ 1, 0.2, 1, 1, 1, 1],
@@ -414,6 +414,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
     position=constants[0].index(cell_value)
     data={}
     
+    data_ingreso=0
     for index, (x, ingreso) in  enumerate(zip(constants, dataIngresos)):
         print("index", index)
         if index==0:
@@ -421,11 +422,16 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
             # print(x[position])
         elif index==1 or index==2 or index==3 or index==4 or index==5:
             data[cell_value]+= float(x[position])*float(ingreso)
+            data_ingreso+=float(x[position])*float(ingreso)
         elif index==6:
              data[cell_value]= data[cell_value]*float(x[position])
         elif index==7:
              print("ingreso", ingreso)
+             capacidad_endeudamiento=data[cell_value]
+             cuota_maxima=data[cell_value]-total_deudas
              data[cell_value]-= float(ingreso)
+             
+
 
     tasa_mensual = tasa / 12
 
@@ -436,10 +442,10 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa):
         
             
             
-    print(cuota_mensual)
+    print({cell_value:{"financiamiento":real_value, "data_ingreso": data_ingreso, "capacidad_endeudamiento": capacidad_endeudamiento, "total_deudas": total_deudas, "cuota_maxima":cuota_maxima, "interes": tasa, "plazo_meses": plazo }})
     
 
-    return {cell_value:real_value}
+    return {cell_value:{"financiamiento":real_value, "data_ingreso": data_ingreso, "capacidad_endeudamiento": capacidad_endeudamiento, "total_deudas": total_deudas, "cuota_maxima":cuota_maxima, "interes": tasa, "plazo_meses": plazo }}
     
 @api_view(['POST'])
 def get_score_crediticio(request):
@@ -497,16 +503,27 @@ def get_score_crediticio(request):
             ]
       
             
-            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa)
-            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa)
-            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa)
-            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa)
-            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa)
-            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa)
+            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa,total_deudas)
+            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa, total_deudas)
+            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa,total_deudas)
+            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa, total_deudas)
+            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa, total_deudas)
+            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa, total_deudas)
             
+            print(BCP)
             
             context = [
-                 BCP,
+                {"bcp": BCP['bcp']['financiamiento']},
+                {"ibk":IBK['ibk']['financiamiento']},
+                {"bbva":BBVA['bbva']['financiamiento']},
+                {"pichincha":PICHINCHA['pichincha']['financiamiento']},
+                {"banbif":BANBIF['banbif']['financiamiento']},
+                {"scotiabank":SCOTIABANK['scotiabank']['financiamiento']},
+            ]
+            
+            
+            dataTable=[
+                 BCP,                 
                  IBK,
                  BBVA,
                  PICHINCHA,
@@ -520,12 +537,16 @@ def get_score_crediticio(request):
             min_value=sorted(result)
             
             resultadoDepartamentos=[]
+            resultadoAllDepartamentos=[]
             
             # resultado_final=getDepasAprobados(resultadoDepartamentos,ingreso_solo_tercera_categoria,residencia,primera_vivienda, cuota_inicial, context, min_value)           
             resultado_final= getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vivienda, cuota_inicial, context, min_value)
             print(resultadoDepartamentos)
+            
+            resultado_all_departamentos= getAllDepartamentos(resultadoAllDepartamentos,valor_porcentaje_inicial,primera_vivienda, cuota_inicial, context, min_value)
+            print(resultadoDepartamentos)
                         
-            return JsonResponse({ "size":len(resultado_final),"bancos":context , "data":resultado_final}, safe=False)
+            return JsonResponse({ "size":len(resultado_final),"bancos":context , "data":resultado_final,"data_table":dataTable, "allData":resultado_all_departamentos },safe=False)
         except Exception as e:
             print(f'Error: {e}')
             return Response({'message': 'Error en el procesamiento'}, status=400)
@@ -690,7 +711,70 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                             
             return resultadoDepartamentos
         
+
+def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,primera_vivienda, cuota_inicial, context, min_value):
+            proyectos = Proyecto.objects.filter(web=True)
+            print(proyectos)
+            for proyecto in proyectos:
+                
+                
+                # valor_porcentaje_inicial_real=getPorcentajeCuotaInicial(ingreso_solo_tercera_categoria, residencia,proyecto.valor_porcentaje_inicial , primera_vivienda)
+                valor_porcentaje_inicial_real =valor_porcentaje_inicial if valor_porcentaje_inicial >= proyecto.valor_porcentaje_inicial else proyecto.valor_porcentaje_inicial
+                departamentos= Departamento.objects.filter(
+                proyecto_id=proyecto.id,
+                estatus="disponible")
+                
+                for depa in departamentos:
+     
+                    BONO= getBono(depa.precio_venta, depa.tipo_moneda, primera_vivienda)
+                    MONTO_INICAL=getMontoIncial(depa.precio_venta, depa.tipo_moneda, cuota_inicial, valor_porcentaje_inicial_real)
+                    MONTO_FINANCIADO = getMontoFinanciado(depa.precio_venta,depa.tipo_moneda,BONO, MONTO_INICAL)
+                    
+                         
+                    for resu in context:
+                             
+                        if  proyecto.banco in resu :
+                           
+                            resultado_all_departamentos.append({
+                                "nro_depa":depa.nro_depa,
+                                "proyecto":proyecto.nombre,
+                                "precio": depa.precio_venta,
+                                "tipo_moneda": depa.tipo_moneda,
+                                "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
+
+                                "bono": BONO,
+                                "monto_inicial": MONTO_INICAL,
+                                "monto_financiado": MONTO_FINANCIADO,
+                                "id": depa.id
+                            })
+                         
+                            print(resu[proyecto.banco])
+                            
+
+
+                        
+                    if  proyecto.banco=="todos":
+
+                        if float(min_value[0]) >= float(MONTO_FINANCIADO):
+                            resultado_all_departamentos.append({
+                            "nro_depa":depa.nro_depa,
+                            "proyecto":proyecto.nombre,
+                            "precio": depa.precio_venta,
+                            "tipo_moneda": depa.tipo_moneda,
+                            "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
+
+                            "bono": BONO,
+                            "monto_inicial": MONTO_INICAL,
+                            "monto_financiado": MONTO_FINANCIADO,
+                            "id": depa.id
+
+                        })
+                        
+                            print(depa)
+                            
+            return resultado_all_departamentos
         
+            
         
 def getFecha(depa:Departamento):
 
