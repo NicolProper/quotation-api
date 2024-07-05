@@ -671,14 +671,15 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                     for resu in context:
                              
                         if  proyecto.banco in resu and cuota_inicial>=MONTO_INICAL and float(resu[proyecto.banco]) >=float(MONTO_FINANCIADO) :
-                           
+                            precio= depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta
+                            sumatoria=MONTO_INICAL+BONO+float(resu[proyecto.banco])
                             resultadoDepartamentos.append({
                                 "nro_depa":depa.nro_depa,
                                 "proyecto":proyecto.nombre,
                                 "precio": depa.precio_venta,
                                 "tipo_moneda": depa.tipo_moneda,
                                 "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
-
+                                "porcentaje": sumatoria/precio,
                                 "bono": BONO,
                                 "monto_inicial": MONTO_INICAL,
                                 "monto_financiado": MONTO_FINANCIADO,
@@ -693,13 +694,15 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                     if  proyecto.banco=="todos" and cuota_inicial>=MONTO_INICAL:
 
                         if float(min_value[0]) >= float(MONTO_FINANCIADO):
+                            precio2=depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta
+                            sumatoria2=MONTO_INICAL+BONO+float(max(min_value))                            
                             resultadoDepartamentos.append({
                             "nro_depa":depa.nro_depa,
                             "proyecto":proyecto.nombre,
                             "precio": depa.precio_venta,
                             "tipo_moneda": depa.tipo_moneda,
                             "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
-
+                             "porcentaje": sumatoria2/precio2,
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
                             "monto_financiado": MONTO_FINANCIADO,
@@ -734,14 +737,17 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
                     for resu in context:
                              
                         if  proyecto.banco in resu :
+                            
+                            precio=depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta 
+                            sumatoria=MONTO_INICAL+BONO+float(resu[proyecto.banco])
                            
                             resultado_all_departamentos.append({
                                 "nro_depa":depa.nro_depa,
                                 "proyecto":proyecto.nombre,
                                 "precio": depa.precio_venta,
                                 "tipo_moneda": depa.tipo_moneda,
-                                "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
-
+                                "precio_real": precio ,
+                                "porcentaje": sumatoria/precio,
                                 "bono": BONO,
                                 "monto_inicial": MONTO_INICAL,
                                 "monto_financiado": MONTO_FINANCIADO,
@@ -756,13 +762,15 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
                     if  proyecto.banco=="todos":
 
                         if float(min_value[0]) >= float(MONTO_FINANCIADO):
+                            precio2=depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta 
+                            sumatoria2=MONTO_INICAL+BONO+float(max(min_value))
                             resultado_all_departamentos.append({
                             "nro_depa":depa.nro_depa,
                             "proyecto":proyecto.nombre,
                             "precio": depa.precio_venta,
                             "tipo_moneda": depa.tipo_moneda,
                             "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
-
+                            "porcentaje": sumatoria2/precio2,
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
                             "monto_financiado": MONTO_FINANCIADO,
