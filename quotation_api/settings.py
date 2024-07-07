@@ -87,14 +87,21 @@ WSGI_APPLICATION = 'quotation_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+ENGINE= os.environ.get('DB_ENGINE')
+NAME=os.environ.get('DB_NAME')
+USER= os.environ.get('DB_USER')
+PASSWORD= os.environ.get('DB_PASSWORD')
+HOST= os.environ.get('DB_HOST')
+PORT= os.environ.get('DB_PORT')
+
 DATABASES = {
     'default': {
-       'ENGINE': os.environ.get('DB_ENGINE'),
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+       'ENGINE': ENGINE,
+        'NAME': NAME,
+        'USER': USER,
+        'PASSWORD': PASSWORD,
+        'HOST': HOST,
+        'PORT': PORT,
     }
 }
 
@@ -179,10 +186,9 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 
-print(f"EMAIL_HOST: {os.environ.get('EMAIL_HOST')}")
-print(f"EMAIL_HOST: {os.environ.get('EMAIL_HOST')}")
-print(f"EMAIL_PORT: {os.environ.get('EMAIL_PORT')}")
-print(f"EMAIL_USE_TLS: {os.environ.get('EMAIL_USE_TLS')}")
-print(f"DB_PORT: {os.environ.get('DB_PORT')}")
-print(f"EMAIL_HOST_PASSWORD: {os.environ.get('EMAIL_HOST_PASSWORD')}")
-print(f"EMAIL_HOST_USER: {os.environ.get('EMAIL_HOST_USER')}")
+print(f"ENGINE: {ENGINE}")
+print(f"NAME: {NAME}")
+print(f"USER: {USER}")
+print(f"PASSWORD: {PASSWORD}")
+print(f"HOST: {HOST}")
+print(f"PORT: {PORT}")
