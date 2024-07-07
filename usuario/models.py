@@ -51,8 +51,6 @@ class User(models.Model):
 
 
 
-        
-    
 
     # Also could be a slug to static url
     def __str__(self):

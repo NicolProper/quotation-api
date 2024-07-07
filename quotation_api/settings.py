@@ -96,12 +96,12 @@ PORT= os.environ.get('DB_PORT')
 
 DATABASES = {
     'default': {
-       'ENGINE': ENGINE,
-        'NAME': NAME,
-        'USER': USER,
-        'PASSWORD': PASSWORD,
-        'HOST': HOST,
-        'PORT': PORT,
+       'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'proper',
+        'USER': 'postgres',
+        'PASSWORD': 'nicolproper',
+        'HOST': 'workshop-data.c1qek8c4yrtg.us-east-2.rds.amazonaws.com',
+        'PORT': 5432,
     }
 }
 
@@ -179,16 +179,12 @@ GOOGLE_API_CREDENTIALS = os.path.join(BASE_DIR, 'credentials.json')
 
 # settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_PORT = os.environ.get('EMAIL_PORT')
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', '').lower() in ['true', 'yes', '1']
+EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 
-print(f"ENGINE: {ENGINE}")
-print(f"NAME: {NAME}")
-print(f"USER: {USER}")
-print(f"PASSWORD: {PASSWORD}")
-print(f"HOST: {HOST}")
-print(f"PORT: {PORT}")
+print(f"EMAIL_HOST_PASSWORD: {EMAIL_HOST_PASSWORD}")
+print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER}")
