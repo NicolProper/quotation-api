@@ -1,4 +1,4 @@
-name: Continuous Deployment
+name: Continous Deployment
 
 on:
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set up Python
+    - name: Setup up Python
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
@@ -37,40 +37,27 @@ jobs:
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
-        aws-access-key-id: ${{ secrets.aws_access_key_id }}
-        aws-secret-access-key: ${{ secrets.aws_secret_access_key }}
+        aws-access-key-id: ${{secrets.aws_access_key_id}}
+
+        aws-secret-access-key: ${{secrets.aws_secret_access_key}}
+
         aws-region: us-east-2
 
-    - name: Set environment variables
-      env:
-        EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-        EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-        EMAIL_USE_TLS: ${{ secrets.EMAIL_USE_TLS }}
-        EMAIL_HOST_USER: ${{ secrets.EMAIL_HOST_USER }}
-        EMAIL_HOST_PASSWORD: ${{ secrets.EMAIL_HOST_PASSWORD }}
-        DB_ENGINE: ${{ secrets.DB_ENGINE }}
-        DB_NAME: ${{ secrets.DB_NAME }}
-        DB_USER: ${{ secrets.DB_USER }}
-        DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        DB_HOST: ${{ secrets.DB_HOST }}
-        DB_PORT: ${{ secrets.DB_PORT }}
-      run: |
-        echo "Environment variables set"
-
-    - name: Setup Requirements
+    - name: Setup up Requirements
       run: |
         source venv/bin/activate
         chmod +x ./getEnv.sh && ./getEnv.sh
         python load_env.py
 
-    - name: "${{ github.event.inputs.choice }}"
+    - name: "${{github.event.inputs.choice}}"
       if: github.ref == 'refs/heads/master'
       run: |
-        source venv/bin/activate
-        zappa "${{ github.event.inputs.choice }}" production
+            source venv/bin/activate
+            zappa "${{github.event.inputs.choice}}" production
     
-    - name: "${{ github.event.inputs.choice }}"
+    - name: "${{github.event.inputs.choice}}"
       if: github.ref == 'refs/heads/develop'
       run: |
-        source venv/bin/activate
-        zappa "${{ github.event.inputs.choice }}" develop
+            source venv/bin/activate
+            zappa "${{github.event.inputs.choice}}" develop        
+              
