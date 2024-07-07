@@ -26,13 +26,13 @@ class ProyectoViewSet(viewsets.ModelViewSet):
 
 from .models import User  # Asegúrate de importar el modelo correcto
 
-def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial):
+def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral):
     # Verificar si ya existe un usuario con el mismo DNI
     if User.objects.filter(dni=dni).exists():
         raise ValueError("Ya existe un usuario con este DNI.")
 
     # Crear un nuevo usuario
-    nuevo_usuario = User(nombre=nombre,apellido=apellido, dni=dni, cuota_hipotecaria=cuota_hipotecaria,  edad=edad, residencia=residencia, ingreso_primera_categoria=ingreso_primera_categoria, ingreso_segunda_categoria=ingreso_segunda_categoria, ingreso_tercera_categoria=ingreso_tercera_categoria, ingreso_cuarta_categoria=ingreso_cuarta_categoria, ingreso_quinta_categoria=ingreso_quinta_categoria, primera_vivienda=primera_vivienda, cuota_vehicular=cuota_vehicular, cuota_personal=cuota_personal, cuota_tarjeta_credito=cuota_tarjeta_credito, cuota_inicial=cuota_inicial)
+    nuevo_usuario = User(nombre=nombre,apellido=apellido, dni=dni, cuota_hipotecaria=cuota_hipotecaria,  edad=edad, residencia=residencia, ingreso_primera_categoria=ingreso_primera_categoria, ingreso_segunda_categoria=ingreso_segunda_categoria, ingreso_tercera_categoria=ingreso_tercera_categoria, ingreso_cuarta_categoria=ingreso_cuarta_categoria, ingreso_quinta_categoria=ingreso_quinta_categoria, primera_vivienda=primera_vivienda, cuota_vehicular=cuota_vehicular, cuota_personal=cuota_personal, cuota_tarjeta_credito=cuota_tarjeta_credito, cuota_inicial=cuota_inicial, continuidad_laboral=continuidad_laboral)
     nuevo_usuario.save()
 
     return nuevo_usuario
@@ -76,9 +76,10 @@ def crear_usuario_view(request):
         cuota_personal=data.get('cuota_personal')
         cuota_tarjeta_credito=data.get('cuota_tarjeta_credito')
         cuota_inicial=data.get('cuota_inicial')
+        continuidad_laboral=data.get('continuidad_laboral')
 
         try:
-            usuario_creado = crear_usuario(nombre,apellido, dni, cuota_hipotecaria, edad, residencia, ingreso_primera_categoria,ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria , ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial)
+            usuario_creado = crear_usuario(nombre,apellido, dni, cuota_hipotecaria, edad, residencia, ingreso_primera_categoria,ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria , ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral)
             return JsonResponse({'mensaje': 'Usuario creado exitosamente', 'id': usuario_creado.id}, status=201)
         except ValueError as e:
             return JsonResponse({'mensaje': str(e)}, status=201)
@@ -124,7 +125,9 @@ def actualizar_usuario_view(request, dni):
         "cuota_vehicular": float(usuario.cuota_vehicular),
         "cuota_personal": float(usuario.cuota_personal),
         "cuota_tarjeta_credito": float(usuario.cuota_tarjeta_credito),
-        "cuota_inicial": float(usuario.cuota_inicial)
+        "cuota_inicial": float(usuario.cuota_inicial),
+        "continuidad_laboral": int(usuario.continuidad_laboral)
+
     }
     return JsonResponse({'mensaje': 'Usuario actualizado correctamente', "data":model}, status=200)
 
@@ -185,28 +188,91 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 #         print(f'An error occurred: {error}')
 #         return None
 
+
+
+
+
+
+
+
+
+
+# @api_view(['POST'])
+# def send_email_with_attachments(request):
+#     if request.method == 'POST':
+#         try:
+#             # Obtener datos del formulario
+#             subject = request.POST.get('subject')
+#             message = request.POST.get('message')
+#             from_email = "nicole.mendoza@proper.com.pe"
+#             to_email = "nicolmendozamattos@gmail.com"
+#             attachments = request.FILES.getlist('attachments')  # Obtener una lista de archivos adjuntos
+#             print(request.FILES.getlist)
+#             print(attachments)
+
+#             # Validar que todos los parámetros necesarios estén presentes
+#             if subject and message and from_email and to_email and attachments:
+#                 try:
+#                     # Configurar el correo electrónico
+#                     email = EmailMultiAlternatives(subject, message, from_email, [to_email])
+#                     email.attach_alternative(message, "text/html")  # Agregar mensaje en formato HTML si es necesario
+                    
+#                     # Adjuntar archivos
+#                     for attachment in attachments:
+#                         print(attachment)
+#                         email.attach(attachment.name, attachment.read(), attachment.content_type)
+                    
+#                     # Enviar el correo electrónico
+#                     email.send()
+                    
+#                     return JsonResponse({'message': 'Correo con adjuntos enviado exitosamente!'})
+#                 except Exception as e:
+#                     return JsonResponse({'error': str(e)}, status=500)
+#             else:
+#                 return JsonResponse({'error': 'Faltan parámetros.'}, status=400)
+#         except KeyError:
+#             return JsonResponse({'error': 'No se proporcionaron los archivos adjuntos.'}, status=400)
+
+#     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+
 @api_view(['POST'])
 def send_email_with_attachments(request):
     if request.method == 'POST':
         try:
+            data_ = request.POST.get('data')
+            data = json.loads(data_)
             # Obtener datos del formulario
-            subject = request.POST.get('subject')
-            message = request.POST.get('message')
-            from_email = "nicole.mendoza@proper.com.pe"
-            to_email = "nicolmendozamattos@gmail.com"
+            subject = data.get('subject')
+            message = data.get('message')
+            remitente= data.get('remitente')
+            destinatario= data.get('destinatario')
+
+            from_email = remitente
+            to_email = destinatario
+            print(subject,message)
+
             attachments = request.FILES.getlist('attachments')  # Obtener una lista de archivos adjuntos
+            print(attachments)
 
             # Validar que todos los parámetros necesarios estén presentes
             if subject and message and from_email and to_email and attachments:
                 try:
                     # Configurar el correo electrónico
+                    print('ingrse_________1')
                     email = EmailMultiAlternatives(subject, message, from_email, [to_email])
                     email.attach_alternative(message, "text/html")  # Agregar mensaje en formato HTML si es necesario
+                    print('ingrse_________2')
                     
+                    # print(type(attachments))  # Asegúrate de que es una lista
+                    # print(attachments)
                     # Adjuntar archivos
                     for attachment in attachments:
+                        print(attachment)  # Imprime los detalles de cada archivo
                         email.attach(attachment.name, attachment.read(), attachment.content_type)
-                    
+                    # print('ingrse_________3')
+
                     # Enviar el correo electrónico
                     email.send()
                     

@@ -47,7 +47,8 @@ class User(models.Model):
 
     
     #coordinadas
-    
+    continuidad_laboral=models.IntegerField(null=False,  default=0) 
+
 
 
         
