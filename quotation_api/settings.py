@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,14 +85,14 @@ WSGI_APPLICATION = 'quotation_api.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-   'default':{
-		'ENGINE': "django.db.backends.postgresql_psycopg2",
-         'NAME':'proper',
-         'USER':'postgres',
-         'PASSWORD':'nicolproper',
-         'HOST':'workshop-data.c1qek8c4yrtg.us-east-2.rds.amazonaws.com',
-         'PORT':'5432',
-         }
+    'default': {
+        'ENGINE': config('DB_ENGINE'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
+    }
 }
 
 # Password validation
@@ -168,8 +169,8 @@ GOOGLE_API_CREDENTIALS = os.path.join(BASE_DIR, 'credentials.json')
 
 # settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'email-smtp.us-east-2.amazonaws.com'  # Cambia esto a la región correcta
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'AKIAQ3EGUNUPEUPV7CUO'
-EMAIL_HOST_PASSWORD = "BBkoH7tjDCwhnF3janHIJen1b7DTJuNSBMdR4XwVlIcN"
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
