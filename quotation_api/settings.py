@@ -179,9 +179,10 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 
-print(f"DB_ENGINE: {os.environ.get('DB_ENGINE')}")
 print(f"DB_NAME: {os.environ.get('DB_NAME')}")
 print(f"DB_USER: {os.environ.get('DB_USER')}")
 print(f"DB_PASSWORD: {os.environ.get('DB_PASSWORD')}")
 print(f"DB_HOST: {os.environ.get('DB_HOST')}")
 print(f"DB_PORT: {os.environ.get('DB_PORT')}")
+print(f"EMAIL_HOST_PASSWORD: {os.environ.get('EMAIL_HOST_PASSWORD')}")
+print(f"DB_ENGINE: {os.environ.get('DB_ENGINE')}")
