@@ -697,7 +697,7 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                         
                     if  proyecto.banco=="todos" and cuota_inicial>=MONTO_INICAL:
 
-                        if float(min_value[0]) >= float(MONTO_FINANCIADO):
+                        if float(max(min_value)) >= float(MONTO_FINANCIADO):
                             precio2=depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta
                             sumatoria2=cuota_inicial+BONO+float(max(min_value))                            
                             resultadoDepartamentos.append({
