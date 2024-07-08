@@ -680,10 +680,12 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                                 "proyecto":proyecto.nombre,
                                 "precio": depa.precio_venta,
                                 "tipo_moneda": depa.tipo_moneda,
+                                "cuota_inicial": cuota_inicial,
+                                "max_financiamiento": resu[proyecto.banco],
                                 "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
                                 "porcentaje": sumatoria/precio,
                                 "bono": BONO,
-                                "monto_inicial": MONTO_INICAL,
+                                "monto_inicial": MONTO_INICAL ,
                                 "monto_financiado": MONTO_FINANCIADO,
                                 "id": depa.id
                             })
@@ -703,8 +705,11 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                             "proyecto":proyecto.nombre,
                             "precio": depa.precio_venta,
                             "tipo_moneda": depa.tipo_moneda,
+                            "cuota_inicial": cuota_inicial,
+                            "max_financiamiento": float(max(min_value))  ,
+
                             "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
-                             "porcentaje": sumatoria2/precio2,
+                            "porcentaje": sumatoria2/precio2,
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
                             "monto_financiado": MONTO_FINANCIADO,
@@ -749,6 +754,9 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
                                 "proyecto":proyecto.nombre,
                                 "precio": depa.precio_venta,
                                 "tipo_moneda": depa.tipo_moneda,
+                                "cuota_inicial": cuota_inicial,
+                                "max_financiamiento": float(resu[proyecto.banco])  ,
+
                                 "precio_real": precio ,
                                 "porcentaje": sumatoria/precio,
                                 "bono": BONO,
@@ -772,6 +780,9 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
                             "proyecto":proyecto.nombre,
                             "precio": depa.precio_venta,
                             "tipo_moneda": depa.tipo_moneda,
+                            "cuota_inicial": cuota_inicial,
+                            "max_financiamiento": float(max(min_value))  ,
+
                             "precio_real": depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta ,
                             "porcentaje": sumatoria2/precio2,
                             "bono": BONO,
