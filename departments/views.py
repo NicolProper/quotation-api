@@ -674,7 +674,7 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                              
                         if  proyecto.banco in resu and cuota_inicial>=MONTO_INICAL and float(resu[proyecto.banco]) >=float(MONTO_FINANCIADO) :
                             precio= depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta
-                            sumatoria=MONTO_INICAL+BONO+float(resu[proyecto.banco])
+                            sumatoria=cuota_inicial+BONO+float(resu[proyecto.banco])
                             resultadoDepartamentos.append({
                                 "nro_depa":depa.nro_depa,
                                 "proyecto":proyecto.nombre,
@@ -697,7 +697,7 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
 
                         if float(min_value[0]) >= float(MONTO_FINANCIADO):
                             precio2=depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta
-                            sumatoria2=MONTO_INICAL+BONO+float(max(min_value))                            
+                            sumatoria2=cuota_inicial+BONO+float(max(min_value))                            
                             resultadoDepartamentos.append({
                             "nro_depa":depa.nro_depa,
                             "proyecto":proyecto.nombre,
@@ -742,7 +742,7 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
                         if  proyecto.banco in resu :
                             
                             precio=depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta 
-                            sumatoria=MONTO_INICAL+BONO+float(resu[proyecto.banco])
+                            sumatoria=cuota_inicial+BONO+float(resu[proyecto.banco])
                            
                             resultado_all_departamentos.append({
                                 "nro_depa":depa.nro_depa,
@@ -766,7 +766,7 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
 
                         # if float(min_value[0]) >= float(MONTO_FINANCIADO):
                             precio2=depa.precio_venta*3.8 if depa.tipo_moneda =="usd" else depa.precio_venta 
-                            sumatoria2=MONTO_INICAL+BONO+float(max(min_value))
+                            sumatoria2=cuota_inicial+BONO+float(max(min_value))
                             resultado_all_departamentos.append({
                             "nro_depa":depa.nro_depa,
                             "proyecto":proyecto.nombre,

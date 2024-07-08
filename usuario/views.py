@@ -250,18 +250,18 @@ def send_email_with_attachments(request):
             destinatario= data.get('destinatario')
 
             from_email = remitente
-            to_email = destinatario
+            to_emails = [remitente,destinatario]
             print(subject,message)
 
             attachments = request.FILES.getlist('attachments')  # Obtener una lista de archivos adjuntos
             print(attachments)
 
             # Validar que todos los parámetros necesarios estén presentes
-            if subject and message and from_email and to_email and attachments:
+            if subject and message and from_email and to_emails and attachments:
                 try:
                     # Configurar el correo electrónico
                     print('ingrse_________1')
-                    email = EmailMultiAlternatives(subject, message, from_email, [to_email])
+                    email = EmailMultiAlternatives(subject, message, from_email, to_emails)
                     email.attach_alternative(message, "text/html")  # Agregar mensaje en formato HTML si es necesario
                     print('ingrse_________2')
                     
