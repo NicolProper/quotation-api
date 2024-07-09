@@ -894,7 +894,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa,
 
     
     departamento_data = {
-        "proyecto": departamento.proyecto.nombre.upper() +" / Tipo: "+ departamento.tipo_departamento,
+        "proyecto": departamento.proyecto.nombre.upper(),
         "nombre_proyecto": departamento.proyecto.nombre,
         "etapa":  departamento.proyecto.etapa,
         "idProyecto":  str(departamento.proyecto.id),
