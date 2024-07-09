@@ -1,10 +1,10 @@
 from django.contrib import admin
 from django.urls import include, path, register_converter
-from cotizacion.views import crear_cotizacion
+from cotizaciones.views import crear_cotizacion
 from departments import views as departamentos_views
+from informacion.views import actualizar_usuario_view, buscar_usuario_por_dni, crear_usuario_view, send_email_with_attachments
 from proyects import views as proyectos_views
 from proyects.views import get_all_proyects_web
-from usuario.views import  actualizar_usuario_view, buscar_usuario_por_dni, crear_usuario_view, match_user_by_DNI, send_email_with_attachments
 
 # Definir el convertidor de float
 class FloatConverter:
@@ -42,7 +42,7 @@ urlpatterns = [
     path('send-simple-email/', send_email_with_attachments, name='send_simple_email'),
 
     path('', include("departments.urls")),
-    path('', include("usuario.urls")),
+    path('', include("informacion.urls")),
     path('', include("proyects.urls")),
-    path('', include("cotizacion.urls")),
+    path('', include("cotizaciones.urls")),
 ]

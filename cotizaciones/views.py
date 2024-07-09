@@ -6,15 +6,15 @@ from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework.decorators import api_view
 
-from cotizacion.models import Cotizacion
-from cotizacion.serializers import CotizacionSerializer
+from cotizaciones.models import Proyectos
+from cotizaciones.serializers import CotizacionesSerializer
 from departments.models import Departamento
 from proyects.models import Proyecto
 
 # Create your views here.
 class CotizacionViewSet(viewsets.ModelViewSet):
-    queryset = Cotizacion.objects.all().order_by('id')  # Ordenar por el campo 'id' u otro campo adecuado
-    serializer_class = CotizacionSerializer 
+    queryset = Proyectos.objects.all().order_by('id')  # Ordenar por el campo 'id' u otro campo adecuado
+    serializer_class = CotizacionesSerializer 
     permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     # filterset_class = USE  # Usar el filtro personalizado
@@ -24,7 +24,7 @@ class CotizacionViewSet(viewsets.ModelViewSet):
 def save_cotizacion(fecha, asesor, correo_asesor,cliente, dni, proyecto, proyecto_nombre, departamento, departamento_nro):
 
     # Crear un nuevo usuario
-    nueva_cotizacion = Cotizacion(fecha=fecha, asesor=asesor, correo_asesor=correo_asesor,cliente=cliente, dni=dni, proyecto=proyecto, proyecto_nombre=proyecto_nombre, departamento=departamento, departamento_nro=departamento_nro)
+    nueva_cotizacion = Proyectos(fecha=fecha, asesor=asesor, correo_asesor=correo_asesor,cliente=cliente, dni=dni, proyecto=proyecto, proyecto_nombre=proyecto_nombre, departamento=departamento, departamento_nro=departamento_nro)
     nueva_cotizacion.save()
 
     return nueva_cotizacion

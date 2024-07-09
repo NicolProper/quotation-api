@@ -43,11 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    "cotizacion",
+    "cotizaciones",
+    "informacion",
     'django_filters',
     'proyects',
     "departments",
-    "usuario"
 ]
 
 MIDDLEWARE = [

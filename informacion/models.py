@@ -4,7 +4,7 @@ from django.dispatch import receiver
 
 # Enum etapa: Planos, preventa, construccion, entrega inme
 
-class User(models.Model):
+class Bancaria(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=200)
     apellido =models.CharField(max_length=200)

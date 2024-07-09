@@ -5,18 +5,18 @@ from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import permissions
 from rest_framework import viewsets
-from usuario.models import User
-from usuario.serializers import UsuarioSerializer
+from informacion.serializers import BancariaSerializer
 # from django.shortcuts import render
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from django.core.mail import EmailMultiAlternatives
+from .models import Bancaria  # Asegúrate de importar el modelo correcto
 
 
 # Create your views here.
-class ProyectoViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all().order_by('id')  # Ordenar por el campo 'id' u otro campo adecuado
-    serializer_class = UsuarioSerializer 
+class BancariaViewSet(viewsets.ModelViewSet):
+    queryset = Bancaria.objects.all().order_by('id')  # Ordenar por el campo 'id' u otro campo adecuado
+    serializer_class = BancariaSerializer 
     permission_classes = [permissions.AllowAny]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     # filterset_class = USE  # Usar el filtro personalizado
@@ -25,15 +25,14 @@ class ProyectoViewSet(viewsets.ModelViewSet):
 # usuario/utils.py
 
 
-from .models import User  # Asegúrate de importar el modelo correcto
 
 def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral):
     # Verificar si ya existe un usuario con el mismo DNI
-    if User.objects.filter(dni=dni).exists():
+    if Bancaria.objects.filter(dni=dni).exists():
         raise ValueError("Ya existe un usuario con este DNI.")
 
     # Crear un nuevo usuario
-    nuevo_usuario = User(nombre=nombre,apellido=apellido, dni=dni, cuota_hipotecaria=cuota_hipotecaria,  edad=edad, residencia=residencia, ingreso_primera_categoria=ingreso_primera_categoria, ingreso_segunda_categoria=ingreso_segunda_categoria, ingreso_tercera_categoria=ingreso_tercera_categoria, ingreso_cuarta_categoria=ingreso_cuarta_categoria, ingreso_quinta_categoria=ingreso_quinta_categoria, primera_vivienda=primera_vivienda, cuota_vehicular=cuota_vehicular, cuota_personal=cuota_personal, cuota_tarjeta_credito=cuota_tarjeta_credito, cuota_inicial=cuota_inicial, continuidad_laboral=continuidad_laboral)
+    nuevo_usuario = Bancaria(nombre=nombre,apellido=apellido, dni=dni, cuota_hipotecaria=cuota_hipotecaria,  edad=edad, residencia=residencia, ingreso_primera_categoria=ingreso_primera_categoria, ingreso_segunda_categoria=ingreso_segunda_categoria, ingreso_tercera_categoria=ingreso_tercera_categoria, ingreso_cuarta_categoria=ingreso_cuarta_categoria, ingreso_quinta_categoria=ingreso_quinta_categoria, primera_vivienda=primera_vivienda, cuota_vehicular=cuota_vehicular, cuota_personal=cuota_personal, cuota_tarjeta_credito=cuota_tarjeta_credito, cuota_inicial=cuota_inicial, continuidad_laboral=continuidad_laboral)
     nuevo_usuario.save()
 
     return nuevo_usuario
@@ -76,15 +75,15 @@ def crear_usuario_view(request):
 @api_view(['PUT'])  # Utilizamos PUT para actualizaciones
 def actualizar_usuario_view(request, dni):
     try:
-        usuario = User.objects.filter(dni=dni).first()
+        usuario = Bancaria.objects.filter(dni=dni).first()
         print(usuario)
-    except User.DoesNotExist:
+    except Bancaria.DoesNotExist:
         return JsonResponse({'mensaje': 'El usuario no existe'}, status=404)
     data_str = request.body
     data = json.loads(data_str)
     print(data)
     # Serializamos el usuario existente con los datos actualizados
-    serializer = UsuarioSerializer(usuario, data=data)
+    serializer = BancariaSerializer(usuario, data=data)
     print(serializer)
     # Actualiza los campos del usuario según los datos recibidos
     for key, value in data.items():
@@ -120,12 +119,12 @@ def actualizar_usuario_view(request, dni):
 @api_view(['GET'])
 def buscar_usuario_por_dni(request, dni):
     try:
-        usuario = User.objects.get(dni=dni)  # Buscar usuario por DNI
-    except User.DoesNotExist:
+        usuario = Bancaria.objects.get(dni=dni)  # Buscar usuario por DNI
+    except Bancaria.DoesNotExist:
         return JsonResponse({'mensaje': 'Usuario no encontrado'}, status=404)
 
     # Serializar el usuario encontrado
-    serializer = UsuarioSerializer(usuario)
+    serializer = BancariaSerializer(usuario)
     
     # Devolver la respuesta con los datos serializados del usuario
     return JsonResponse({"data":serializer.data, "mensaje": "Usuario encontrado"}, status=200)

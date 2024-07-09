@@ -5,7 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from dateutil.relativedelta import relativedelta
 from django.db.models import Q
 
-from usuario.models import User
+from informacion.models import Bancaria
 from .models import Departamento
 from .serializers import DepartamentoSerializer
 from rest_framework import permissions
@@ -482,7 +482,7 @@ def match_user_by_DNI(dni):
         
         # Verifica si se encontraron usuarios
         if not usuario:
-            usuario_new = User.objects.filter(dni=dni).first()
+            usuario_new = Bancaria.objects.filter(dni=dni).first()
             
             return {
                 'nombre':  usuario_new.nombre,
@@ -886,7 +886,7 @@ def getFecha(depa:Departamento):
 def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa, plazoMeses, porcentajeInicial):
     print('ingrese')
     departamento = Departamento.objects.get(id=idDepartamento)
-    cliente=User.objects.get(id=idCliente)
+    cliente=Bancaria.objects.get(id=idCliente)
     print(cliente.cuota_inicial)
     print(departamento.precio_venta)
     print(departamento.proyecto.valor_porcentaje_inicial)
