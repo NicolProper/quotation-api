@@ -6,7 +6,7 @@ from proyects.models import Proyecto
 
 # Enum etapa: Planos, preventa, construccion, entrega inme
 
-class Cotizacion(models.Model):
+class Proyectos(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     fecha = models.DateField(blank=True)
     asesor =models.CharField(max_length=100)
