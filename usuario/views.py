@@ -1,4 +1,5 @@
 import json
+from django.db import models
 
 from rest_framework.filters import OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
@@ -36,22 +37,6 @@ def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, in
     nuevo_usuario.save()
 
     return nuevo_usuario
-
-# @api_view(['POST'])
-# def actualizar_usuario(request, dni):
-#     try:
-#         usuario = User.objects.get(dni=dni)
-#     except User.DoesNotExist:
-#         return Response({"error": "El usuario no existe"}, status=)
-
-#     # Aquí procesas la actualización del usuario con los datos recibidos en la solicitud
-#     serializer = UserSerializer(usuario, data=request.data, partial=True)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response(serializer.data)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 # usuario/views.py
@@ -145,95 +130,60 @@ def buscar_usuario_por_dni(request, dni):
     # Devolver la respuesta con los datos serializados del usuario
     return JsonResponse({"data":serializer.data, "mensaje": "Usuario encontrado"}, status=200)
 
+class Cliente(models.Model):
+    id= models.IntegerField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    tipodoc = models.CharField(max_length=100)
+
+    nrodoc = models.CharField(max_length=10)
+    email = models.IntegerField()
+    edadrango = models.CharField(max_length=100)
+    nrocelular = models.CharField(max_length=100)
+    
+    class Meta:
+        db_table = 'cliente'
+        managed = False  # Indica que Django no debería gestionar (crear, modificar) esta tabla
+
+    def __str__(self):
+        return f'{self.nombre} {self.apellido}'
+
+    
+def match_user_by_DNI(request, dni):
+    try:
+        print(dni)
+        # Realiza la consulta a la base de datos secundaria
+        usuario = Cliente.objects.using('postgres').filter(nrodoc=dni).first()
+        
+        # Verifica si se encontraron usuarios
+        if not usuario:
+            return JsonResponse({'message': 'No se encontró ningún usuario con ese DNI.'}, status=404)
+        
+        # Crea una lista para almacenar los datos de los usuarios
+        usuarios_data = []
+        print(usuario)
+        # for usuario in usuarios:
+        usuarios_data={
+                'nombre': usuario.nombre  if usuario.nombre is not None else '',
+                'apellido': usuario.apellido  if usuario.apellido is not None else '',
+                'dni': usuario.nrodoc if usuario.nrodoc is not None else '',
+                "email": usuario.email if usuario.email is not None else ''
+            }
+        
+        # Devuelve la lista de usuarios como una respuesta JSON
+        return JsonResponse({'message': 'Se encontró el usuario con ese DNI.', "data": usuarios_data}, safe=False)
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+    # Serializar el usuario encontrado
+    # serializer = UsuarioSerializer(usuario)
+    
+    # Devolver la respuesta con los datos serializados del usuario
+
+# SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 
-
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
-
-# def get_gmail_service():
-#     creds = None
-#     token_path = os.path.join('token.json')
-
-#     if os.path.exists(token_path):
-#         creds = Credentials.from_authorized_user_file(token_path, SCOPES)
-#     if not creds or not creds.valid:
-#         if creds and creds.expired and creds.refresh_token:
-#             creds.refresh(Request())
-#         else:
-#             flow = InstalledAppFlow.from_client_secrets_file(
-#                 os.path.join('credentials.json'), SCOPES)
-#             creds = flow.run_local_server(port=0)
-#         with open(token_path, 'w') as token:
-#             token.write(creds.to_json())
-
-#     try:
-#         service = build('gmail', 'v1', credentials=creds)
-#         return service
-#     except HttpError as error:
-#         print(f'An error occurred: {error}')
-#         return None
-
-# def send_email(service, sender, to, subject, message_text):
-#     message = MIMEText(message_text)
-#     message['to'] = to
-#     message['from'] = sender
-#     message['subject'] = subject
-#     raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
-#     body = {'raw': raw_message}
-#     try:
-#         message = service.users().messages().send(userId='me', body=body).execute()
-#         print(f'Message Id: {message["id"]}')
-#         return message
-#     except HttpError as error:
-#         print(f'An error occurred: {error}')
-#         return None
-
-
-
-
-
-
-
-
-
-
-# @api_view(['POST'])
-# def send_email_with_attachments(request):
-#     if request.method == 'POST':
-#         try:
-#             # Obtener datos del formulario
-#             subject = request.POST.get('subject')
-#             message = request.POST.get('message')
-#             from_email = "nicole.mendoza@proper.com.pe"
-#             to_email = "nicolmendozamattos@gmail.com"
-#             attachments = request.FILES.getlist('attachments')  # Obtener una lista de archivos adjuntos
-#             print(request.FILES.getlist)
-#             print(attachments)
-
-#             # Validar que todos los parámetros necesarios estén presentes
-#             if subject and message and from_email and to_email and attachments:
-#                 try:
-#                     # Configurar el correo electrónico
-#                     email = EmailMultiAlternatives(subject, message, from_email, [to_email])
-#                     email.attach_alternative(message, "text/html")  # Agregar mensaje en formato HTML si es necesario
-                    
-#                     # Adjuntar archivos
-#                     for attachment in attachments:
-#                         print(attachment)
-#                         email.attach(attachment.name, attachment.read(), attachment.content_type)
-                    
-#                     # Enviar el correo electrónico
-#                     email.send()
-                    
-#                     return JsonResponse({'message': 'Correo con adjuntos enviado exitosamente!'})
-#                 except Exception as e:
-#                     return JsonResponse({'error': str(e)}, status=500)
-#             else:
-#                 return JsonResponse({'error': 'Faltan parámetros.'}, status=400)
-#         except KeyError:
-#             return JsonResponse({'error': 'No se proporcionaron los archivos adjuntos.'}, status=400)
-
-#     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 

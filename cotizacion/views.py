@@ -1,0 +1,57 @@
+import json
+from django.http import JsonResponse
+from django.shortcuts import render
+from rest_framework import viewsets
+from rest_framework import permissions
+from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
+from rest_framework.decorators import api_view
+
+from cotizacion.models import Cotizacion
+from cotizacion.serializers import CotizacionSerializer
+from departments.models import Departamento
+from proyects.models import Proyecto
+
+# Create your views here.
+class CotizacionViewSet(viewsets.ModelViewSet):
+    queryset = Cotizacion.objects.all().order_by('id')  # Ordenar por el campo 'id' u otro campo adecuado
+    serializer_class = CotizacionSerializer 
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    # filterset_class = USE  # Usar el filtro personalizado
+    ordering_fields = '__all__'
+    
+    
+def save_cotizacion(fecha, asesor, correo_asesor,cliente, dni, proyecto, proyecto_nombre, departamento, departamento_nro):
+
+    # Crear un nuevo usuario
+    nueva_cotizacion = Cotizacion(fecha=fecha, asesor=asesor, correo_asesor=correo_asesor,cliente=cliente, dni=dni, proyecto=proyecto, proyecto_nombre=proyecto_nombre, departamento=departamento, departamento_nro=departamento_nro)
+    nueva_cotizacion.save()
+
+    return nueva_cotizacion
+
+
+# usuario/views.py
+@api_view(['POST'])
+def crear_cotizacion(request):
+    if request.method == 'POST':
+        data_ = request.body
+        data = json.loads(data_)
+        
+        fecha= data.get('fecha')
+        asesor= data.get('asesor')
+        correo_asesor=data.get('correo_asesor')
+        cliente=data.get('cliente')
+        dni= data.get('dni') 
+        proyecto=Proyecto.objects.get(id=data.get('proyecto'))
+        proyecto_nombre=data.get('proyecto_nombre')
+        departamento=Departamento.objects.get(id=data.get('departamento'))
+        departamento_nro=data.get('departamento_nro')
+        
+
+        try:
+            cotizacion_creada = save_cotizacion(fecha, asesor, correo_asesor,cliente, dni, proyecto, proyecto_nombre, departamento, departamento_nro)
+            return JsonResponse({'mensaje': 'Usuario creado exitosamente', 'id': cotizacion_creada.id}, status=201)
+        except ValueError as e:
+            return JsonResponse({'mensaje': str(e)}, status=201)
+
+    return JsonResponse({'mensaje': 'Método no permitido'}, status=405)

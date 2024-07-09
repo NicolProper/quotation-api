@@ -19,6 +19,8 @@ from rest_framework import generics
 from rest_framework.filters import OrderingFilter
 from .filters import DepartamentoFilter
 import xlwings as xw
+from django.db import models
+
 from datetime import date, timedelta
 from django.db.models import F, Case, When, FloatField, Value
 from rest_framework.decorators import api_view
@@ -398,7 +400,7 @@ def calcular_van(pago_periodico, tasa_interes, valor_presente):
     
     return van
 
-def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas):
+def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, valor_porcentaje_endeudamiento):
     constants = [
                     [ 'bcp', 'ibk', 'bbva', 'pichincha', 'banbif', 'scotiabank'],
                     [ 1, 0.2, 1, 1, 1, 1],
@@ -406,7 +408,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas):
                     [ 1, 0, 0, 0, 0, 0],
                     [ 1, 1, 1, 1, 1, 1],
                     [ 1, 1, 1, 1, 1, 1],
-                    [ 0.4, 0.4, 0.4, 0.4, 0.4, 0.4],
+                    [ valor_porcentaje_endeudamiento, valor_porcentaje_endeudamiento, valor_porcentaje_endeudamiento, valor_porcentaje_endeudamiento, valor_porcentaje_endeudamiento, valor_porcentaje_endeudamiento],
                     [ 0, 0, 0, 0, 0, 0]
 
                 ]
@@ -448,6 +450,72 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas):
 
     return {cell_value:{"financiamiento":real_value, "data_ingreso": data_ingreso, "capacidad_endeudamiento": capacidad_endeudamiento, "total_deudas": total_deudas, "cuota_maxima":cuota_maxima, "interes": tasa, "plazo_meses": plazo }}
     
+    
+    
+    
+    
+    
+class Cliente(models.Model):
+    id= models.IntegerField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    apellido = models.CharField(max_length=100)
+    tipodoc = models.CharField(max_length=100)
+
+    nrodoc = models.CharField(max_length=10)
+    email = models.IntegerField()
+    edadrango = models.CharField(max_length=100)
+    nrocelular = models.CharField(max_length=100)
+    
+    class Meta:
+        db_table = 'cliente'
+        managed = False  # Indica que Django no debería gestionar (crear, modificar) esta tabla
+
+    def __str__(self):
+        return f'{self.nombre} {self.apellido}'
+
+    
+def match_user_by_DNI(dni):
+    try:
+        print(dni)
+        # Realiza la consulta a la base de datos secundaria
+        usuario = Cliente.objects.using('postgres').filter(nrodoc=dni).first()
+        
+        # Verifica si se encontraron usuarios
+        if not usuario:
+            usuario_new = User.objects.filter(dni=dni).first()
+            
+            return {
+                'nombre':  usuario_new.nombre,
+                'apellido': usuario_new.apellido,
+                'dni': usuario_new.dni,
+                "email": ''
+                }
+        
+        # Crea una lista para almacenar los datos de los usuarios
+        usuarios_data = []
+        print(usuario)
+        # for usuario in usuarios:
+        usuarios_data={
+                'nombre': usuario.nombre  if usuario.nombre is not None else '',
+                'apellido': usuario.apellido  if usuario.apellido is not None else '',
+                'dni': usuario.nrodoc if usuario.nrodoc is not None else '',
+                "email": usuario.email if usuario.email is not None else ''
+            }
+        
+        # Devuelve la lista de usuarios como una respuesta JSON
+        return  usuarios_data
+
+    except Exception as e:
+        print(e)
+        return {
+                'nombre':  '',
+                'apellido': '',
+                'dni': '',
+                "email": ''
+                }
+    
+    
+    
 @api_view(['POST'])
 def get_score_crediticio(request):
     if request.method == 'POST':
@@ -476,7 +544,7 @@ def get_score_crediticio(request):
             tasa=data.get('tasa')
             plazo_meses=data.get('plazo_meses')
             valor_porcentaje_inicial= data.get('valor_porcentaje_inicial')
-
+            valor_porcentaje_endeudamiento= data.get('valor_porcentaje_endeudamiento')
             total_deudas=0
             
             print(00)
@@ -504,12 +572,12 @@ def get_score_crediticio(request):
             ]
       
             
-            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa,total_deudas)
-            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa, total_deudas)
-            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa,total_deudas)
-            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa, total_deudas)
-            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa, total_deudas)
-            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa, total_deudas)
+            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento)
+            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento)
+            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento)
+            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento)
+            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento)
+            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento)
             
             print(BCP)
             
@@ -547,7 +615,10 @@ def get_score_crediticio(request):
             resultado_all_departamentos= getAllDepartamentos(resultadoAllDepartamentos,valor_porcentaje_inicial,primera_vivienda, cuota_inicial, context, min_value)
             print(resultadoDepartamentos)
                         
-            return JsonResponse({ "size":len(resultado_final),"bancos":context , "data":resultado_final,"data_table":dataTable, "allData":resultado_all_departamentos },safe=False)
+            cliente_info= match_user_by_DNI(dni)
+            print("cliente______________________info")
+            print(cliente_info)
+            return JsonResponse({ "size":len(resultado_final),"bancos":context , "data":resultado_final,"data_table":dataTable, "allData":resultado_all_departamentos, "cliente": cliente_info },safe=False)
         except Exception as e:
             print(f'Error: {e}')
             return Response({'message': 'Error en el procesamiento'}, status=400)
@@ -824,7 +895,9 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa,
     
     departamento_data = {
         "proyecto": departamento.proyecto.nombre.upper() +" / Tipo: "+ departamento.tipo_departamento,
+        "nombre_proyecto": departamento.proyecto.nombre,
         "etapa":  departamento.proyecto.etapa,
+        "idProyecto":  str(departamento.proyecto.id),
         "tipologia":  departamento.tipo_departamento,
         "numero_depa":  departamento.nombre,
         "valor_inmueble":departamento.precio_venta if departamento.tipo_moneda=="pen" else departamento.precio_venta*3.8, #update

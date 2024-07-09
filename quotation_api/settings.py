@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-
+    "cotizacion",
     'django_filters',
     'proyects',
     "departments",
@@ -102,7 +102,15 @@ DATABASES = {
         'PASSWORD': 'nicolproper',
         'HOST': 'workshop-data.c1qek8c4yrtg.us-east-2.rds.amazonaws.com',
         'PORT': 5432,
-    }
+    },
+       'postgres': {
+       'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'nicolproper',
+        'HOST': 'workshop-data.c1qek8c4yrtg.us-east-2.rds.amazonaws.com',
+        'PORT': 5432,
+    },
 }
 
 # Password validation
