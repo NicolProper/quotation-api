@@ -452,7 +452,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, va
                                              nombre=nombre, apellido=apellido, dni=dni, 
                                              ingresos=data_ingreso,
                                              deudas=total_deudas, tasa_interes=tasa, plazo_meses=plazo, valor_porcentaje_inicial=valor_porcentaje_inicial,valor_porcentaje_capacidad_deuda=valor_porcentaje_endeudamiento,
-                                             banco='bcp',
+                                             banco=cell_value,
                                              financiamiento_max=round(real_value, 2),
                                              )
     
