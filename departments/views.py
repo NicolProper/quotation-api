@@ -13,6 +13,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import pandas as pd
 from proyects.models import Proyecto
+from financiamiento.models import Cliente
 from .filters import DepartamentoFilter, DepartamentoFilter2
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
 from rest_framework import generics
@@ -400,7 +401,7 @@ def calcular_van(pago_periodico, tasa_interes, valor_presente):
     
     return van
 
-def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, valor_porcentaje_endeudamiento):
+def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial):
     constants = [
                     [ 'bcp', 'ibk', 'bbva', 'pichincha', 'banbif', 'scotiabank'],
                     [ 1, 0.2, 1, 1, 1, 1],
@@ -447,6 +448,19 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, va
             
     print({cell_value:{"financiamiento":real_value, "data_ingreso": data_ingreso, "capacidad_endeudamiento": capacidad_endeudamiento, "total_deudas": total_deudas, "cuota_maxima":cuota_maxima, "interes": tasa, "plazo_meses": plazo }})
     
+    nuevo_financiamiento=Cliente(fecha=datetime.date.today(), 
+                                             nombre=nombre, apellido=apellido, dni=dni, 
+                                             ingresos=data_ingreso,
+                                             deudas=total_deudas, tasa_interes=tasa, plazo_meses=plazo, valor_porcentaje_inicial=valor_porcentaje_inicial,valor_porcentaje_capacidad_deuda=valor_porcentaje_endeudamiento,
+                                             banco='bcp',
+                                             financiamiento_max=round(real_value, 2),
+                                             )
+    
+    print('nuevo_financiamiento')
+    print(nuevo_financiamiento)
+            
+    nuevo_financiamiento.save()
+    
 
     return {cell_value:{"financiamiento":real_value, "data_ingreso": data_ingreso, "capacidad_endeudamiento": capacidad_endeudamiento, "total_deudas": total_deudas, "cuota_maxima":cuota_maxima, "interes": tasa, "plazo_meses": plazo }}
     
@@ -455,7 +469,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, va
     
     
     
-class Cliente(models.Model):
+class ClientePostgres(models.Model):
     id= models.IntegerField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)
@@ -478,7 +492,7 @@ def match_user_by_DNI(dni):
     try:
         print(dni)
         # Realiza la consulta a la base de datos secundaria
-        usuario = Cliente.objects.using('postgres').filter(nrodoc=dni).first()
+        usuario = ClientePostgres.objects.using('postgres').filter(nrodoc=dni).first()
         
         # Verifica si se encontraron usuarios
         if not usuario:
@@ -526,7 +540,9 @@ def get_score_crediticio(request):
             data = json.loads(data_)
 
             
-            nombre= data.get('nombre_completo')
+            nombre= data.get('nombre')
+            apellido= data.get('apellido')
+
             dni=data.get('dni')
             edad=data.get('edad')
             residencia= data.get('residencia') #Perú , Extranjero
@@ -572,12 +588,12 @@ def get_score_crediticio(request):
             ]
       
             
-            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento)
-            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento)
-            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento)
-            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento)
-            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento)
-            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento)
+            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial)
+            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial)
+            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial)
+            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial)
+            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial)
+            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial)
             
             print(BCP)
             
@@ -589,6 +605,13 @@ def get_score_crediticio(request):
                 {"banbif":BANBIF['banbif']['financiamiento']},
                 {"scotiabank":SCOTIABANK['scotiabank']['financiamiento']},
             ]
+            
+ 
+            # for data in context:
+
+                 
+            
+
             
             
             dataTable=[

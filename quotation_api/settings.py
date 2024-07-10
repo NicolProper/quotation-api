@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     "cotizaciones",
+    "financiamiento",
     "informacion",
     'django_filters',
     'proyects',
