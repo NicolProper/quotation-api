@@ -45,4 +45,6 @@ urlpatterns = [
     path('', include("informacion.urls")),
     path('', include("proyects.urls")),
     path('', include("cotizaciones.urls")),
+    path('', include("financiamiento.urls")),
+
 ]
