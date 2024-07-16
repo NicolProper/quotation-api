@@ -46,6 +46,8 @@ class Departamento(models.Model):
     precio_dolar = models.FloatField(null=True)
     precio_lista = models.FloatField(default=0)
     estatus = models.CharField(max_length=100, default="no disponible")
+    ocultar = models.BooleanField(default=False)
+
     precio_workshop = models.FloatField(null=True)
     valor_descuento_preventa = models.FloatField(null=True)
     reservado = models.BooleanField(default=False)

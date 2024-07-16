@@ -1,11 +1,19 @@
-# from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
-# from proyects.views import upload_data_excel
-from .api import CotizacionesViewSet  # Asegúrate de que esta importación sea correcta
+from django.urls import path, register_converter
+from . import views
 
-router = DefaultRouter()
-router.register('api/cotizaciones', CotizacionesViewSet, basename="cotizaciones")
-# router.register('Cotizacions/upload_data/', upload_data_excel, basename="Cotizacions_upload")
+class FloatConverter:
+    regex = r'\d+(\.\d+)?'
 
-urlpatterns = router.urls
+    def to_python(self, value):
+        return float(value)
+
+    def to_url(self, value):
+        return str(value)
+
+register_converter(FloatConverter, 'float')
+
+urlpatterns = [
+
+     path('crear_cotizacion/', views.crear_cotizacion, name="crear_cotizacion"),
+]

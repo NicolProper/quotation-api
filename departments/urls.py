@@ -1,12 +1,25 @@
-# from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
-# from departments.views import upload_data_excel
-from .api import DepartamentoViewSet  # Asegúrate de que esta importación sea correcta
+from django.urls import path, register_converter
+from . import views
+class FloatConverter:
+    regex = r'\d+(\.\d+)?'
 
-router = DefaultRouter()
-router.register('api/departamentos', DepartamentoViewSet, basename="departamentos")
-# router.register('departamentos/upload_data/', upload_data_excel, basename="proyectos_upload")
+    def to_python(self, value):
+        return float(value)
 
+    def to_url(self, value):
+        return str(value)
 
-urlpatterns = router.urls
+register_converter(FloatConverter, 'float')
+
+urlpatterns = [
+    path('upload_data/', views.upload_data_excel, name="departamentos_upload"),
+    path('getAllDepartamentos/', views.getAllDepas, name="departamentos_get_all"),
+    path('update_all_data/', views.update_all_data, name="update_all_data"),
+    path(
+        'info_departamento_proyecto_analyzer/<int:idDepartamento>/<uuid:idCliente>/<float:tasa>/<float:plazoMeses>/<float:porcentajeInicial>/',
+        views.info_departamento_proyecto_analyzer,
+        name="info_departamento_proyecto"
+    ),
+    path('get_score_crediticio/', views.get_score_crediticio, name='get_score_crediticio'),
+]
