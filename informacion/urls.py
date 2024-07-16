@@ -1,12 +1,26 @@
-# from django.urls import path, include
-from rest_framework.routers import DefaultRouter
 
-from informacion.views import BancariaViewSet
+from django.urls import path, register_converter
+from .views import (
+    actualizar_usuario_view, 
+    buscar_usuario_por_dni, 
+    crear_usuario_view, 
+    send_email_with_attachments
+)
 
-# from proyects.views import upload_data_excel
+class FloatConverter:
+    regex = r'\d+(\.\d+)?'
 
-router = DefaultRouter()
-router.register('api/bancario', BancariaViewSet, basename="bancario")
-# router.register('proyectos/upload_data/', upload_data_excel, basename="proyectos_upload")
+    def to_python(self, value):
+        return float(value)
 
-urlpatterns = router.urls
+    def to_url(self, value):
+        return str(value)
+
+register_converter(FloatConverter, 'float')
+
+urlpatterns = [
+    path('crear/', crear_usuario_view, name='crear_usuario'),
+    path('actualizar/<str:dni>/', actualizar_usuario_view, name='actualizar-usuario'),
+    path('buscar/<str:dni>/', buscar_usuario_por_dni, name='buscar_usuario_por_dni'),
+    path('send-simple-email/', send_email_with_attachments, name='send_simple_email'),
+]

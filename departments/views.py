@@ -755,6 +755,8 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                 valor_porcentaje_inicial_real =valor_porcentaje_inicial if valor_porcentaje_inicial >= proyecto.valor_porcentaje_inicial else proyecto.valor_porcentaje_inicial
                 departamentos= Departamento.objects.filter(
                 proyecto_id=proyecto.id,
+                ocultar=False,
+
                 estatus="disponible")
                 
                 for depa in departamentos:
@@ -827,6 +829,7 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
                 valor_porcentaje_inicial_real =valor_porcentaje_inicial if valor_porcentaje_inicial >= proyecto.valor_porcentaje_inicial else proyecto.valor_porcentaje_inicial
                 departamentos= Departamento.objects.filter(
                 proyecto_id=proyecto.id,
+                ocultar=False,
                 estatus="disponible")
                 
                 for depa in departamentos:
