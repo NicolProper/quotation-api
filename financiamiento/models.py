@@ -16,6 +16,7 @@ class Cliente(models.Model):
     valor_porcentaje_capacidad_deuda=models.FloatField(null=False,  default=0) #gastos de capital
     banco = models.CharField(max_length=200)
     financiamiento_max=models.FloatField(null=False,  default=0) #costo de cierre
+    asesor=models.CharField(max_length=200, default='')
 
     
     def __str__(self):
