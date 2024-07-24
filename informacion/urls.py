@@ -21,6 +21,7 @@ register_converter(FloatConverter, 'float')
 urlpatterns = [
     path('crear/', crear_usuario_view, name='crear_usuario'),
     path('actualizar/<str:dni>/', actualizar_usuario_view, name='actualizar-usuario'),
+    
     path('buscar/<str:dni>/', buscar_usuario_por_dni, name='buscar_usuario_por_dni'),
     path('send-simple-email/', send_email_with_attachments, name='send_simple_email'),
 ]

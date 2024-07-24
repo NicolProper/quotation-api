@@ -1,5 +1,7 @@
 
 from django.urls import path, register_converter
+
+from departments.images import delete_image_view, upload_image_view
 from . import views
 class FloatConverter:
     regex = r'\d+(\.\d+)?'
@@ -22,4 +24,8 @@ urlpatterns = [
         name="info_departamento_proyecto"
     ),
     path('get_score_crediticio/', views.get_score_crediticio, name='get_score_crediticio'),
+# urlpatterns = [
+    path('upload-image/', upload_image_view, name='upload_image'),
+    path('delete-image/', delete_image_view, name='delete_image'),
+# ]
 ]
