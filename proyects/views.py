@@ -411,3 +411,29 @@ def get_project_by_name(request, nombre):
         return Response({'data': proyecto_data}, status=status.HTTP_200_OK)
     except Proyecto.DoesNotExist:
         return Response({'error': 'Proyecto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+@api_view(['POST'])
+def updateDepartmentsDisponible(request):
+    if request.method == 'POST':
+        try:
+            data_ = request.body
+            data = json.loads(data_)
+            fecha_actualizacion = data.get('fecha_actualizacion')
+
+            if fecha_actualizacion:
+                # Convertir la fecha de entrada al formato adecuado
+                fecha_actualizacion_db = datetime.strptime(fecha_actualizacion, '%d-%m-%Y').strftime('%Y-%m-%d')
+                
+                # Filtra los departamentos cuya fecha_actualizacion es diferente a la enviada
+                departamentos_a_actualizar = Departamento.objects.exclude(fecha_actualizacion=fecha_actualizacion_db)
+                
+                # Actualiza el campo estatus a "no disponible"
+                departamentos_a_actualizar.update(estatus='no disponible')
+
+                return Response({'message': 'Departamentos actualizados exitosamente'}, status=200)
+            else:
+                return Response({'message': 'Fecha de actualización no proporcionada'}, status=400)
+        except Exception as e:
+            print(f'error: {e}')
+            return Response({'message': 'Error al actualizar los departamentos'}, status=400)

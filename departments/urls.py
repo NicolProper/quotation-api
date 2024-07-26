@@ -27,5 +27,11 @@ urlpatterns = [
 # urlpatterns = [
     path('upload-image/', upload_image_view, name='upload_image'),
     path('delete-image/', delete_image_view, name='delete_image'),
+    path('create-update/', views.upload_data_department, name="upload_data_department"),
+    path('info-department-by-nro-depa/<str:nro_depa>/<str:slug>/', views.get_info_department_by_nro_depa, name="get_info_department_by_nro_depa"),
+
+    path('get_nro_depa_departments/<str:slug>/', views.get_nro_depas_by_project, name="get_nro_depas_by_project"),
+
 # ]
 ]
+# get_nro_depas_by_project
