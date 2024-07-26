@@ -1209,6 +1209,168 @@ def upload_data_department(request):
             print(f'error: {e}')
             return Response({'message': 'Error on file upload'}, status=400)
 
+@api_view(['POST'])
+def edit_data_stock_department(request):
+    if request.method == 'POST':
+        try:
+            data_ = request.body
+            data = json.loads(data_)
+            fecha_actualizacion = data.get('fecha_actualizacion') if not pd.isna(data.get('fecha_actualizacion')) else None
+            proyecto = data.get('proyecto').lower() if not pd.isna(data.get('proyecto')) else None
+            nro_depa = data.get('nro_depa') if not pd.isna(data.get('nro_depa')) else None
+            estatus = data.get('estatus').lower() if not pd.isna(data.get('estatus')) else None
+
+
+
+            fields = {
+
+                "fecha_actualizacion": fecha_actualizacion,
+                'nro_depa': nro_depa,
+                "estatus":estatus
+
+            }
+
+            fields_not_none = {key: value for key, value in fields.items() if value is not None}
+
+            if fields_not_none:
+                
+                    proyecto_obj = Proyecto.objects.filter(nombre=proyecto).first()
+                    
+                    if proyecto_obj:
+                        nro_depa = fields_not_none.get('nro_depa')
+                        existing_department = Departamento.objects.filter(nro_depa=nro_depa, proyecto=proyecto_obj).first()
+                        
+                        if existing_department:
+                            for key, value in fields_not_none.items():
+                                setattr(existing_department, key, value)
+                            existing_department.save()
+                            return Response({'message': 'Departamento actualizado con éxito'}, status=200)
+
+            return Response({'message': 'Data processed successfully'}, status=200)
+
+        except Exception as e:
+            print(f'error: {e}')
+            return Response({'message': 'Error on file upload'}, status=400)
+
+@api_view(['POST'])
+def edit_data_department(request):
+    if request.method == 'POST':
+        try:
+            data_ = request.body
+            data = json.loads(data_)
+            fecha_actualizacion = data.get('fecha_actualizacion') if not pd.isna(data.get('fecha_actualizacion')) else None
+
+            proyecto = data.get('proyecto').lower() if not pd.isna(data.get('proyecto')) else None
+            tipo_inventario = data.get('tipo_inventario') if not pd.isna(data.get('tipo_inventario')) else None
+
+            nro_depa = data.get('nro_depa') if not pd.isna(data.get('nro_depa')) else None
+            nombre = nro_depa
+            tipo_moneda = data.get('tipo_moneda').lower() if not pd.isna(data.get('tipo_moneda')) else None
+            precio = data.get('precio') if not pd.isna(data.get('precio')) else None
+            precio_venta = data.get('precio_venta') if not pd.isna(data.get('precio_venta')) else None
+            nro_dormitorios = data.get('nro_dormitorios') if not pd.isna(data.get('nro_dormitorios')) else None
+            nro_banos = data.get('nro_banos') if not pd.isna(data.get('nro_banos')) else None
+            valor_alquiler = data.get('valor_alquiler') if not pd.isna(data.get('valor_alquiler')) else None
+            unit_area = data.get('unit_area') if not pd.isna(data.get('unit_area')) else None
+            vista = data.get('vista').lower() if not pd.isna(data.get('vista')) else None
+            piso = data.get('piso') if not pd.isna(data.get('piso')) else None
+            tipo_departamento = data.get('tipo_departamento') if not pd.isna(data.get('tipo_departamento')) else None
+            ocultar = ocultarDef(data.get('ocultar'))
+            precio_workshop = 0
+            valor_descuento_preventa = 0
+
+            tir_ = 0
+            roi_ = 0
+            valor_cuota_ = 0
+            renta_ = 0
+            patrimonio_inicial_ = 0
+            patrimonio_anio_5_ = 0
+            patrimonio_anio_10_ = 0
+            patrimonio_anio_20_ = 0
+            patrimonio_anio_30_ = 0
+
+            proyecto_obj = Proyecto.objects.filter(nombre=proyecto).first()
+            fecha_entrega_updated = datetime.date.today().replace(day=1) if proyecto_obj and proyecto_obj.etapa == "inmediata" else proyecto_obj.fecha_entrega if proyecto_obj else None
+
+            if proyecto_obj and precio and valor_alquiler and unit_area and proyecto_obj.valor_porcentaje_inicial and fecha_entrega_updated:
+                newprecio = precio * 3.8 if tipo_moneda == "usd" else precio
+                precio_dolar = precio if tipo_moneda == "usd" else 0
+
+                data = analyze_api(
+                    proyecto_obj.tasa_credito, newprecio, valor_alquiler, unit_area, proyecto_obj.valor_porcentaje_inicial, 
+                    fecha_entrega_updated, proyecto_obj.costo_porcentaje_instalacion, proyecto_obj.descuento_porcentaje_preventa, 
+                    proyecto_obj.costo_porcentaje_operativo, proyecto_obj.costo_porcentaje_administrativo, proyecto_obj.corretaje, 
+                    proyecto_obj.plazo_meses, proyecto_obj.dias_vacancia, proyecto_obj.costo_porcentaje_capex_reparaciones, 
+                    proyecto_obj.costo_porcentaje_administrativos_venta,
+                    proyecto_obj.etapa, tipo_moneda)
+                
+                print(data['resultado'])
+
+                tir_ = round(data['resultado']['tir'], 8)
+                roi_ = round(data['resultado']['roi'], 8)
+                renta_ = round(data['resultado']['renta'], 8)
+                valor_cuota_ = round(data['resultado']['valor_cuota'], 8)
+                patrimonio_inicial_ = round(data['resultado']['patrimonio_inicial'], 8)
+                patrimonio_anio_5_ = round(data['resultado']['patrimonio_anio_5'], 8)
+                patrimonio_anio_10_ = round(data['resultado']['patrimonio_anio_10'], 8)
+                patrimonio_anio_20_ = round(data['resultado']['patrimonio_anio_20'], 8)
+                patrimonio_anio_30_ = round(data['resultado']['patrimonio_anio_30'], 8)
+
+            fields = {
+                'ocultar':ocultar,
+                'nombre': nombre,
+                "fecha_actualizacion": fecha_actualizacion,
+                'nro_depa': nro_depa,
+                'unit_area': unit_area,
+                'nro_dormitorios': nro_dormitorios,
+                'nro_banos': nro_banos,
+                'valor_alquiler': valor_alquiler,
+                'piso': piso,
+                'vista': vista,
+                'precio': newprecio,
+                "precio_venta":precio_venta,
+                "precio_dolar": precio_dolar,
+                'precio_workshop': precio_workshop,
+                'valor_descuento_preventa': valor_descuento_preventa,
+                'tipo_moneda': tipo_moneda,
+                "tipo_departamento": tipo_departamento,
+                "tipo_inventario": tipo_inventario,
+                'patrimonio_inicial': patrimonio_inicial_,
+                "patrimonio_anio_5": patrimonio_anio_5_,
+                "patrimonio_anio_10": patrimonio_anio_10_,
+                'patrimonio_anio_20': patrimonio_anio_20_,
+                'patrimonio_anio_30': patrimonio_anio_30_,
+                "tir": tir_,
+                "roi": roi_,
+                "valor_cuota": valor_cuota_,
+                "renta": renta_
+            }
+
+            fields_not_none = {key: value for key, value in fields.items() if value is not None}
+
+            if fields_not_none:
+                if tipo_inventario == "proyecto":
+                    proyecto_obj = Proyecto.objects.filter(nombre=proyecto).first()
+                    
+                    if proyecto_obj:
+                        nro_depa = fields_not_none.get('nro_depa')
+                        existing_department = Departamento.objects.filter(nro_depa=nro_depa, proyecto=proyecto_obj).first()
+                        
+                        if existing_department:
+                            for key, value in fields_not_none.items():
+                                setattr(existing_department, key, value)
+                            existing_department.save()
+                            return Response({'message': 'Departamento actualizado con éxito'}, status=200)
+                        else:
+                            departamento = Departamento.objects.create(proyecto=proyecto_obj, **fields_not_none)
+                            return Response({'message': 'Departamento creado con éxito'}, status=201)
+
+            return Response({'message': 'Data processed successfully'}, status=200)
+
+        except Exception as e:
+            print(f'error: {e}')
+            return Response({'message': 'Error on file upload'}, status=400)
+
 
 @api_view(['GET'])
 def get_info_department_by_nro_depa(request, nro_depa, slug):
