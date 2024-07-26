@@ -201,7 +201,7 @@ def upload_data_project(request):
             data_ = request.body
             data = json.loads(data_)
             
-            nombre = data.get('nombre')
+            nombre = data.get('nombre').lower()
             texto_sin_tildes = unidecode.unidecode(nombre)
             slug = re.sub(r'\s+', '-', texto_sin_tildes.lower())
             distrito = data.get('distrito').lower()
