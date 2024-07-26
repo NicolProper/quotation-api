@@ -1141,6 +1141,8 @@ def upload_data_department(request):
                     proyecto_obj.costo_porcentaje_administrativos_venta,
                     proyecto_obj.etapa, tipo_moneda)
                 
+                print(data)
+                
                 print(data['resultado'])
 
                 tir_ = round(data['resultado']['tir'], 8)

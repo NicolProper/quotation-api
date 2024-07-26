@@ -302,11 +302,13 @@ def upload_data_project(request):
 
 @api_view(['POST'])
 def active_project(request, slug):
+    print(slug)
     if not slug:
         return Response({'error': 'El campo "slug" es obligatorio'}, status=400)
 
     try:
-        proyecto = Proyecto.objects.get(slug=slug)
+        proyecto = Proyecto.objects.filter(slug=slug).first()
+        print(proyecto)
         filters = {
             'proyecto': proyecto,
             'roi__gt':0,
@@ -315,8 +317,9 @@ def active_project(request, slug):
             'estatus': "disponible",
             "ocultar":False
         }
+        
         departamentos =Departamento.objects.filter(**filters).exists()
-        tipos_departamento= departamentos.values_list('tipo_departamento', flat=True).distinct()
+        # tipos_departamento= departamentos.values_list('tipo_departamento', flat=True).distinct()
 
         if departamentos:
         
