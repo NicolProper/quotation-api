@@ -25,4 +25,6 @@ urlpatterns = [
     path('get_project_by_name/<str:nombre>/', views.get_project_by_name, name="get_project_by_name"),
     path('create-update/', views.upload_data_project, name="create-update"),
     path('get_all_proyects_web/', views.get_all_proyects_web, name="get_all_proyects_web"),
+    path('get_all_proyects_web/', views.get_all_proyects_web, name="get_all_proyects_web"),
+
 ]
