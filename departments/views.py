@@ -1098,7 +1098,7 @@ def upload_data_department(request):
             proyecto = data.get('proyecto').lower() if not pd.isna(data.get('proyecto')) else None
             tipo_inventario = data.get('tipo_inventario') if not pd.isna(data.get('tipo_inventario')) else None
 
-            nro_depa = data.get('nro_depa') if not pd.isna(data.get('nro_depa')) else None
+            nro_depa = str(data.get('nro_depa')) if not pd.isna(data.get('nro_depa')) else None
             nombre = nro_depa
             tipo_moneda = data.get('tipo_moneda').lower() if not pd.isna(data.get('tipo_moneda')) else None
             precio = data.get('precio') if not pd.isna(data.get('precio')) else None
@@ -1188,6 +1188,14 @@ def upload_data_department(request):
 
             fields_not_none = {key: value for key, value in fields.items() if value is not None}
 
+            def parse_date(date_str):
+                if isinstance(date_str, str):
+                    try:
+                        return datetime.datetime.strptime(date_str, '%Y-%m-%d').date()
+                    except ValueError:
+                        return datetime.datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S').date()
+                return date_str
+
             if fields_not_none:
                 if tipo_inventario == "proyecto":
                     proyecto_obj = Proyecto.objects.filter(nombre=proyecto).first()
@@ -1197,19 +1205,33 @@ def upload_data_department(request):
                         existing_department = Departamento.objects.filter(nro_depa=nro_depa, proyecto=proyecto_obj).first()
                         
                         if existing_department:
+                            updated_fields = {}
                             for key, value in fields_not_none.items():
-                                setattr(existing_department, key, value)
+                                old_value = getattr(existing_department, key)
+                                if isinstance(old_value, str) and isinstance(value, str):
+                                    old_value = old_value.lower()
+                                    value = value.lower()
+                                elif key == "fecha_actualizacion":
+                                    # Parse both dates to datetime.date for comparison
+                                    old_value = parse_date(old_value)
+                                    value = parse_date(value)
+                                if old_value != value:
+                                    updated_fields[key] = {'old': old_value, 'new': value}
+                                    setattr(existing_department, key, value)
                             existing_department.save()
-                            return Response({'message': 'Departamento actualizado con éxito'}, status=200)
+                            return Response({'message': 'Departamento actualizado con éxito', 'updated_fields': updated_fields, "nro_depa":existing_department.nro_depa, "proyecto":existing_department.proyecto.nombre, "isUpdated":True if len(updated_fields)>0 else False  }, status=200)
                         else:
                             departamento = Departamento.objects.create(proyecto=proyecto_obj, **fields_not_none)
-                            return Response({'message': 'Departamento creado con éxito'}, status=201)
+                            return Response({'message': 'Departamento creado con éxito',"nro_depa":departamento.nro_depa, "proyecto":departamento.proyecto.nombre, "isUpdated":False }, status=200)
 
             return Response({'message': 'Data processed successfully'}, status=200)
 
         except Exception as e:
             print(f'error: {e}')
             return Response({'message': 'Error on file upload'}, status=400)
+
+
+
 
 @api_view(['POST'])
 def edit_data_stock_department(request):
