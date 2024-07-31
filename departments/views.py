@@ -1427,3 +1427,21 @@ def get_info_department_by_nro_depa(request, nro_depa, slug):
     except Exception as e:
         print(f'Error: {e}')
         return Response({'message': 'Error al obtener los departamentos', "data": []}, status=500)
+    
+    
+    
+@api_view(['GET'])
+def get_typologies_by_project(request, slug):
+    try:
+        proyecto = Proyecto.objects.filter(slug=slug).first()
+        if not proyecto:
+            return Response({'message': 'Proyecto no encontrado', "data": []}, status=404)
+        
+        departments = Departamento.objects.filter(proyecto=proyecto, estatus="disponible").values('tipo_departamento').distinct()
+        data=map(lambda x : x['tipo_departamento'], departments)
+        # print(list(data))
+        return Response({'data': list(data)}, status=200)
+        
+    except Exception as e:
+        print(f'Error: {e}')
+        return Response({'message': 'Error al obtener los departamentos', "data": []}, status=500)

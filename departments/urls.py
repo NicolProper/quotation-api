@@ -28,7 +28,7 @@ urlpatterns = [
     path('upload-image/', upload_image_view, name='upload_image'),
     path('delete-image/', delete_image_view, name='delete_image'),
     path('create-update/', views.upload_data_department, name="upload_data_department"),
-    
+    path('get_typologies_by_project/<str:slug>/', views.get_typologies_by_project, name="get_typologies_by_project"),
     path('edit/', views.edit_data_department, name="upload_data_department"),
     path('stock/', views.edit_data_stock_department, name="stock"),
 
