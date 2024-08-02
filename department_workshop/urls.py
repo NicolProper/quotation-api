@@ -24,6 +24,6 @@ urlpatterns = [
     path('get_nro_depas_by_project_workshop/<int:id>/', views.get_nro_depas_by_project_workshop, name="get_nro_depas_by_project"),
     path('upload-image/', upload_image_view, name='upload_image'),
     path('delete-image/', delete_image_view, name='delete_image'),
-# ]
+    path('get_departments_workshop/', views.get_departments_workshop, name="get_departments_workshop")
 ]
 # get_nro_depas_by_project

@@ -63,7 +63,7 @@ def upload_data_department(request):
                     if existing_department:
                         # Crear o actualizar el registro en departments_workshop
                         department_workshop, created = Departamento_Workshop.objects.update_or_create(
-                            nro_depa=nro_depa, proyecto=proyecto_obj,
+                            nro_depa=nro_depa, proyecto=proyecto_obj,  fecha_workshop=fecha_workshop,
                             defaults={
                                 'precio_workshop': precio_workshop,
                                 'fecha_workshop': fecha_workshop,
@@ -82,8 +82,36 @@ def upload_data_department(request):
             return Response({'message': 'Error en la carga de datos'}, status=400)
         
 
+@api_view(['POST'])
+def get_departments_workshop(request):
+    try:
+        data_ = request.body
+        data = json.loads(data_)
+        print(data)
+        
+        fecha_workshop_str = data.get('fecha_workshop')
+        fecha_workshop = None
+        if fecha_workshop_str and not pd.isna(fecha_workshop_str):
+            fecha_workshop = datetime.datetime.strptime(fecha_workshop_str, '%Y-%m-%d').date()
 
-
+        departamentos = Departamento_Workshop.objects.filter(fecha_workshop=fecha_workshop)
+        data = []
+        for depa in departamentos:
+            data.append({
+                "proyecto": depa.proyecto.nombre,
+                "nro_depa": depa.nro_depa,
+                "precio": depa.precio,
+                "precio_workshop": depa.precio_workshop,
+                "proyecto_id": depa.proyecto.id
+            })
+                
+        return Response({'data': data}, status=200)
+    except Exception as e:
+        print(f'Error: {e}')
+        return Response({'error': []}, status=400)
+    
+    
+    
 @api_view(['GET'])
 def get_nro_depas_by_project_workshop(request, id):
     try:

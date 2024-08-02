@@ -2,6 +2,7 @@ import json
 import pandas as pd
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from department_workshop.models import Departamento_Workshop
 from project_workshop.models import Proyecto_Workshop
 from proyects.models import Proyecto
 from rest_framework.decorators import api_view
@@ -131,6 +132,28 @@ def update_info_project(request, id):
             project.parrafo = parrafo
             project.save()
             return Response({'message': 'Datos actualizados correctamente'}, status=200)
+        else:
+            return Response({'message': 'Proyecto no encontrado'}, status=404)
+
+    except Exception as e:
+        print(f'Error: {e}')
+        return Response({'message': 'Error en la carga de datos'}, status=400)
+    
+    
+    # get_all_projects_workshop
+    
+@api_view(['GET'])
+def get_all_projects_workshop(request):
+    try:
+        data_ = request.body
+        data = json.loads(data_)
+        fecha_workshop = data.get('fecha_workshop').lower() if data.get('fecha_workshop') and not pd.isna(data.get('fecha_workshop')) else None
+
+        departamentos = Departamento_Workshop.objects.filter(fecha_workshop=fecha_workshop).distinct('proyecto')
+
+        if departamentos.exists():
+            proyectos = [departamento.proyecto for departamento in departamentos]
+            return Response({'message': 'Datos actualizados correctamente', 'proyectos': proyectos}, status=200)
         else:
             return Response({'message': 'Proyecto no encontrado'}, status=404)
 

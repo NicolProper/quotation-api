@@ -20,7 +20,7 @@ urlpatterns = [
     path('create-update/', views.upload_data_proyecto, name="create-update"),
     path('get_all_proyects_name_id/', views.get_all_projects_name_id, name="get_all_projects_name_id"),
     path('get_info_project/<int:id>/', views.get_info_project, name="get_info_project"),
-    path('update_info_project/<int:id>/', views.update_info_project, name="update_info_project")
-    # path('get_all_proyects_web/', views.get_all_proyects_web, name="get_all_proyects_web"),
+    path('update_info_project/<int:id>/', views.update_info_project, name="update_info_project"),
+    path('get_all_projects_workshop/', views.get_all_projects_workshop, name="get_all_projects_workshop"),
 
 ]
