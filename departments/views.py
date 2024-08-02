@@ -1244,22 +1244,16 @@ def edit_data_stock_department(request):
             nro_depa = data.get('nro_depa') if not pd.isna(data.get('nro_depa')) else None
             estatus = data.get('estatus').lower() if not pd.isna(data.get('estatus')) else None
 
-
-
             fields = {
-
                 "fecha_actualizacion": fecha_actualizacion,
                 'nro_depa': nro_depa,
                 "estatus":estatus
-
             }
 
             fields_not_none = {key: value for key, value in fields.items() if value is not None}
 
             if fields_not_none:
-                
                     proyecto_obj = Proyecto.objects.filter(nombre=proyecto).first()
-                    
                     if proyecto_obj:
                         nro_depa = fields_not_none.get('nro_depa')
                         existing_department = Departamento.objects.filter(nro_depa=nro_depa, proyecto=proyecto_obj).first()
@@ -1275,6 +1269,9 @@ def edit_data_stock_department(request):
         except Exception as e:
             print(f'error: {e}')
             return Response({'message': 'Error on file upload'}, status=400)
+
+
+
 
 @api_view(['POST'])
 def edit_data_department(request):
@@ -1445,3 +1442,20 @@ def get_typologies_by_project(request, slug):
     except Exception as e:
         print(f'Error: {e}')
         return Response({'message': 'Error al obtener los departamentos', "data": []}, status=500)
+    
+    
+@api_view(['GET'])
+def get_department_by_proyecto(request, name_proyecto, nro_depa):
+    try:
+        # print(proyecto,nro_depa )
+        proyecto = Proyecto.objects.filter(nombre=name_proyecto).first()
+        print(proyecto)
+        departamento= Departamento.objects.filter(nro_depa=nro_depa, proyecto=proyecto).first()
+        if not departamento:
+            return Response({"data": False}, status=200)
+
+        return Response({'data': True}, status=200)
+        
+    except Exception as e:
+        print(f'Error: {e}')
+        return Response({ "data": False}, status=201)

@@ -27,6 +27,7 @@ urlpatterns = [
 # urlpatterns = [
     path('upload-image/', upload_image_view, name='upload_image'),
     path('delete-image/', delete_image_view, name='delete_image'),
+    path('get_department_by_proyecto/<str:name_proyecto>/<str:nro_depa>/', views.get_department_by_proyecto, name="get_department_by_proyecto"),
     path('create-update/', views.upload_data_department, name="upload_data_department"),
     path('get_typologies_by_project/<str:slug>/', views.get_typologies_by_project, name="get_typologies_by_project"),
     path('edit/', views.edit_data_department, name="upload_data_department"),

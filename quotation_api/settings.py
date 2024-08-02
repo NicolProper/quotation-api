@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django_filters',
     'proyects',
     "departments",
+    "project_workshop",
+    "department_workshop"
 ]
 
 MIDDLEWARE = [

@@ -10,4 +10,7 @@ urlpatterns = [
     path('usuarios/', include('informacion.urls')),
     path('cotizacion/', include('cotizaciones.urls')),
     path('financiamiento/', include('financiamiento.urls')),
+    path('proyectos-workshop/', include('project_workshop.urls')),
+    path('departamentos-workshop/', include('department_workshop.urls')),
+
 ]
