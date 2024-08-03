@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-ra@6#@-i180&p6ep^6jilfvp&mo#sc7@e-l@98r!))#oe3iutg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [    "http://localhost:3000","localhost", "127.0.0.1","98jz8fku6f.execute-api.us-east-2.amazonaws.com", "ta1fvfcr52.execute-api.us-east-2.amazonaws.com"]
 
@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django_filters',
     'proyects',
     "departments",
+    "project_workshop",
+    "department_workshop"
 ]
 
 MIDDLEWARE = [
@@ -185,3 +187,17 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 
 print(f"EMAIL_HOST_PASSWORD: {EMAIL_HOST_PASSWORD}")
 print(f"EMAIL_HOST_USER: {EMAIL_HOST_USER}")
+
+
+AWS_ACCESS_KEY_ID = os.environ.get('ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('STORAGE_BUCKET_NAME')
+# AWS_STORAGE_BUCKET_NAME = 'properworkshop' 
+
+AWS_S3_SIGNATURE_NAME = 's3v4',
+AWS_S3_REGION_NAME = 'us-east-2'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL =  None
+AWS_S3_VERIFY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+APPEND_SLASH = False

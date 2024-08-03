@@ -9,6 +9,7 @@ class Proyecto(models.Model):
     slug = models.CharField(max_length=200, default='')
     fecha_entrega = models.DateField(blank=True)
     fecha_ingreso = models.DateField(default="1900-02-01")
+    nombre_real = models.CharField(max_length=200,  default='')
     # precio_desde =  models.FloatField(blank=True, default=0)
 
     class Etapa(models.TextChoices):

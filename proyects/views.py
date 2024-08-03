@@ -1,5 +1,7 @@
 import datetime
+import json
 import re
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -8,6 +10,8 @@ from rest_framework.response import Response
 import pandas as pd
 import unidecode
 from django.db.models import Q
+
+from departments.models import Departamento
 from .models import Proyecto
 from .serializers import ProyectoSerializer
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,6 +19,7 @@ from rest_framework.filters import OrderingFilter
 from .filters import ProyectosFilter
 from datetime import date, timedelta
 from dateutil.relativedelta import relativedelta
+from rest_framework import status
 
 class ProyectoViewSet(viewsets.ModelViewSet):
     queryset = Proyecto.objects.all().order_by('id')  # Ordenar por el campo 'id' u otro campo adecuado
@@ -188,6 +193,250 @@ def get_all_proyects_web(reques):
               
         
     
+# API View to upload excel and save data to database
+@api_view(['POST'])
+def upload_data_project(request):
+    if request.method == 'POST':
+        try:
+            data_ = request.body
+            data = json.loads(data_)
+            
+            nombre = data.get('nombre').lower()
+            texto_sin_tildes = unidecode.unidecode(nombre)
+            slug = re.sub(r'\s+', '-', texto_sin_tildes.lower())
+            distrito = data.get('distrito').lower()
+            fecha_entrega = data.get('fecha_entrega') if not pd.isna(data.get('fecha_entrega')) else None
+            fecha_ingreso = data.get('fecha_entrega') if not pd.isna(data.get('fecha_entrega')) else None
+            banco = data.get('banco').lower() if not pd.isna(data.get('banco')) else None
 
+            etapa = data.get('etapa').lower() if not pd.isna(data.get('etapa')) else None
+            nro_pisos = data.get('nro_pisos') if not pd.isna(data.get('nro_pisos')) else None
+            nro_dptos = data.get('nro_dptos') if not pd.isna(data.get('nro_dptos')) else None
+            valor_de_separacion = data.get('valor_de_separacion') if not pd.isna(data.get('valor_de_separacion')) else None
+            valor_porcentaje_inicial = data.get('valor_porcentaje_inicial') if not pd.isna(data.get('valor_porcentaje_inicial')) else None
+            valor_porcentaje_financiado = data.get('valor_porcentaje_financiado') if not pd.isna(data.get('valor_porcentaje_financiado')) else None
+            areas_comunes = True if data.get('areas_comunes') == "SI" else False
+            piscina = True if data.get('piscina') == "SI" else False
+            gym = True if data.get('gym') == "SI" else False
+            coworking = True if data.get('coworking') == "SI" else False
+            cine = True if data.get('cine') == "SI" else False
+            parrilla = True if data.get('parrilla') == "SI" else False
+            sum = True if data.get('sum') == "SI" else False
+            bicicleta = True if data.get('bicicleta') == "SI" else False
+            bar = True if data.get('bar') == "SI" else False
+            coordenada_A = data.get('coordenada_A') if not pd.isna(data.get('coordenada_A')) else None
+            coordenada_B = data.get('coordenada_B') if not pd.isna(data.get('coordenada_B')) else None
+            
+            
+            dias_vacancia = data.get('dias_vacancia') if not pd.isna(data.get('dias_vacancia')) else None
+            costo_porcentaje_operativo = data.get('costo_porcentaje_operativo') if not pd.isna(data.get('costo_porcentaje_operativo')) else None
+            costo_porcentaje_administrativo = data.get('costo_porcentaje_administrativo') if not pd.isna(data.get('costo_porcentaje_administrativo')) else None
+            costo_porcentaje_instalacion = data.get('costo_porcentaje_instalacion') if not pd.isna(data.get('costo_porcentaje_instalacion')) else None
+            
+            costo_porcentaje_capex_reparaciones = data.get('costo_porcentaje_capex_reparaciones') if not pd.isna(data.get('costo_porcentaje_capex_reparaciones')) else None
+            costo_porcentaje_administrativos_venta = data.get('costo_porcentaje_administrativos_venta') if not pd.isna(data.get('costo_porcentaje_administrativos_venta')) else None
+            corretaje = True if data.get('corretaje') == "SI" else False
+            tasa_credito = data.get('tasa_credito') if not pd.isna(data.get('tasa_credito')) else None
+            plazo_meses = data.get('plazo_meses') if not pd.isna(data.get('plazo_meses')) else None
+            descuento_porcentaje_preventa = data.get('descuento_porcentaje_preventa') if not pd.isna(data.get('descuento_porcentaje_preventa')) else None
+
+ 
+
+            fields = {
+                "nombre": nombre,
+                "distrito": distrito,
+                "banco": banco,
+                "fecha_ingreso": fecha_ingreso,
+                "areas_comunes": areas_comunes,
+                "piscina": piscina,
+                "gym": gym,
+                "coworking": coworking,
+                "cine": cine,
+                "parrilla": parrilla,
+                "sum": sum,
+                "bicicleta": bicicleta,
+                "bar": bar,
+                "slug": slug,
+                "fecha_entrega": fecha_entrega,
+                "etapa": etapa,
+                "nro_pisos": nro_pisos,
+                "nro_dptos": nro_dptos,
+
+                "valor_de_separacion": valor_de_separacion,
+                "valor_porcentaje_inicial": valor_porcentaje_inicial,
+                "valor_porcentaje_financiado": valor_porcentaje_financiado,
+                "dias_vacancia": dias_vacancia,
+                "costo_porcentaje_operativo": costo_porcentaje_operativo,
+                "costo_porcentaje_administrativo": costo_porcentaje_administrativo,
+                "costo_porcentaje_instalacion": costo_porcentaje_instalacion,
+                "corretaje": corretaje,
+                "tasa_credito": tasa_credito,
+                "plazo_meses": plazo_meses,
+                "descuento_porcentaje_preventa": descuento_porcentaje_preventa,
+                "costo_porcentaje_capex_reparaciones": costo_porcentaje_capex_reparaciones,
+                "costo_porcentaje_administrativos_venta": costo_porcentaje_administrativos_venta,
+                "coordenada_A": coordenada_A,
+                "coordenada_B": coordenada_B
+            }
+
+            fields_not_none = {key: value for key, value in fields.items() if value is not None}
+
+            if fields_not_none:
+                proyecto, created = Proyecto.objects.update_or_create(
+                    nombre=fields_not_none['nombre'],
+                    defaults=fields_not_none
+                )
+                if created:
+                    return Response({'message': 'Proyecto Cargado'}, status=200)
+                else:
+                    return Response({'message': 'Proyecto Actualizado'}, status=200)
+
+        except KeyError:
+            return Response({'message': 'Archivo no válido'}, status=400)
+        except pd.errors.EmptyDataError:
+            return Response({'message': 'El archivo está vacío'}, status=400)
+        except Exception as e:
+            return Response({'message': str(e)}, status=500)
+
+
+
+@api_view(['POST'])
+def active_project(request, slug):
+    print(slug)
+    if not slug:
+        return Response({'error': 'El campo "slug" es obligatorio'}, status=400)
+
+    try:
+        proyecto = Proyecto.objects.filter(slug=slug).first()
+        print(proyecto)
+        filters = {
+            'proyecto': proyecto,
+            'roi__gt':0,
+            'tir__gt': 0,
+            'renta__gt': 0,
+            'estatus': "disponible",
+            "ocultar":False
+        }
+        
+        departamentos =Departamento.objects.filter(**filters).exists()
+        # tipos_departamento= departamentos.values_list('tipo_departamento', flat=True).distinct()
+
+        if departamentos:
+        
+            proyecto.web = True
+            proyecto.save()
+            return Response({'message': 'Success'}, status=200)
+        else:
+            return Response({'message': 'Not exits Departments avaible'}, status=200)
+
+    except Proyecto.DoesNotExist:
+        return Response({'message': 'Something went wrong'}, status=400)
 
         
+
+@api_view(['POST'])
+def desactive_project(request, slug):
+    if not slug:
+        return Response({'error': 'El campo "slug" es obligatorio'}, status=400)
+
+    try:
+        proyecto = Proyecto.objects.get(slug=slug)
+        proyecto.web = False
+        proyecto.save()
+        return Response({'message': 'Success'}, status=200)
+
+    except Proyecto.DoesNotExist:
+        return Response({'message': 'Something went wrong'}, status=400)
+    
+@api_view(['GET'])
+def get_all_projects(request):
+    # Utiliza values_list para obtener solo los nombres de los proyectos
+    departamentos_data = Proyecto.objects.values_list('nombre', flat=True)
+
+    # Devolver los departamentos como JSON
+    return Response({'data': list(departamentos_data)})
+        
+@api_view(['GET'])
+def get_all_projects_slugs(request):
+    # Utiliza values_list para obtener solo los nombres de los proyectos
+    departamentos_data = Proyecto.objects.values('nombre', 'slug')
+    # Devolver los departamentos como JSON
+    return Response({'data': list(departamentos_data)})
+        
+@api_view(['GET'])
+def get_project_by_name(request, nombre):
+    try:
+        proyecto = Proyecto.objects.get(nombre=nombre)
+        proyecto_data = {
+            'nombre': proyecto.nombre,
+            'nombre_real': proyecto.nombre,
+
+            'distrito': proyecto.distrito,
+            'banco': proyecto.banco,
+            'fecha_entrega': proyecto.fecha_entrega,
+            'fecha_ingreso': proyecto.fecha_ingreso,
+            'etapa': proyecto.etapa,
+            'banco': proyecto.banco,
+            'nro_pisos': proyecto.nro_pisos,
+            'nro_dptos': proyecto.nro_dptos,
+            "valor_de_separacion": proyecto.valor_de_separacion,
+            "valor_porcentaje_inicial" : proyecto.valor_porcentaje_inicial,
+            "valor_porcentaje_financiado" : proyecto.valor_porcentaje_financiado,
+    
+            "areas_comunes": "SI" if proyecto.areas_comunes else "NO",
+            "piscina":   "SI" if proyecto.piscina else "NO",
+            "gym":  "SI" if proyecto.gym  else "NO",
+            "coworking" :  "SI" if proyecto.coworking else "NO",
+            "cine" :  "SI" if proyecto.cine else "NO",
+            "parrilla" :  "SI" if  proyecto.parrilla else "NO",
+            "sum" :   "SI" if proyecto.sum else "NO",
+            "bicicleta":  "SI" if proyecto.bicicleta  else "NO",
+            "workshop" :  "SI" if proyecto.workshop else "NO",
+            "web":  "SI" if proyecto.web else "NO",
+            "bar":  "SI" if proyecto.workshop else "NO",
+            
+            "dias_vacancia":proyecto.dias_vacancia,
+            "costo_porcentaje_operativo":proyecto.costo_porcentaje_operativo,
+            "costo_porcentaje_administrativo":proyecto.costo_porcentaje_administrativo,
+            "costo_porcentaje_instalacion":proyecto.costo_porcentaje_instalacion,
+            "corretaje": proyecto.corretaje ,
+            "tasa_credito": proyecto.tasa_credito,
+            "costo_porcentaje_capex_reparaciones":proyecto.costo_porcentaje_capex_reparaciones, #gastos de capital
+            "plazo_meses" :proyecto.plazo_meses,
+            "descuento_porcentaje_preventa":proyecto.descuento_porcentaje_preventa  ,
+            "costo_porcentaje_administrativos_venta":proyecto.costo_porcentaje_administrativos_venta, #costo de cierre
+            "coordenada_A":proyecto.coordenada_A if proyecto.coordenada_A else 0,
+            "coordenada_B":proyecto.coordenada_B if proyecto.coordenada_B else 0,
+            
+            
+            # Agrega más campos según sea necesario
+        }
+        return Response({'data': proyecto_data}, status=status.HTTP_200_OK)
+    except Proyecto.DoesNotExist:
+        return Response({'error': 'Proyecto no encontrado'}, status=status.HTTP_404_NOT_FOUND)
+    
+    
+@api_view(['POST'])
+def updateDepartmentsDisponible(request):
+    if request.method == 'POST':
+        try:
+            data_ = request.body
+            data = json.loads(data_)
+            fecha_actualizacion = data.get('fecha_actualizacion')
+
+            if fecha_actualizacion:
+                # Convertir la fecha de entrada al formato adecuado
+                fecha_actualizacion_db = datetime.strptime(fecha_actualizacion, '%d-%m-%Y').strftime('%Y-%m-%d')
+                
+                # Filtra los departamentos cuya fecha_actualizacion es diferente a la enviada
+                departamentos_a_actualizar = Departamento.objects.exclude(fecha_actualizacion=fecha_actualizacion_db)
+                
+                # Actualiza el campo estatus a "no disponible"
+                departamentos_a_actualizar.update(estatus='no disponible')
+
+                return Response({'message': 'Departamentos actualizados exitosamente'}, status=200)
+            else:
+                return Response({'message': 'Fecha de actualización no proporcionada'}, status=400)
+        except Exception as e:
+            print(f'error: {e}')
+            return Response({'message': 'Error al actualizar los departamentos'}, status=400)
