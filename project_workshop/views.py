@@ -142,20 +142,39 @@ def update_info_project(request, id):
     
     # get_all_projects_workshop
     
-@api_view(['GET'])
+@api_view(['POST'])
 def get_all_projects_workshop(request):
     try:
+        # Parse request body
         data_ = request.body
         data = json.loads(data_)
-        fecha_workshop = data.get('fecha_workshop').lower() if data.get('fecha_workshop') and not pd.isna(data.get('fecha_workshop')) else None
-
+        print("Received data:", data)
+        
+        # Get fecha_workshop and validate
+        fecha_workshop = data.get('fecha_workshop')
+        if fecha_workshop is not None and pd.isna(fecha_workshop):
+            fecha_workshop = None
+        
+        print("Fecha workshop:", fecha_workshop)
+        
+        # Query the database
         departamentos = Departamento_Workshop.objects.filter(fecha_workshop=fecha_workshop).distinct('proyecto')
-
+        print("Departamentos found:", departamentos)
+        data=[]
+        # Check if any departamentos exist and respond accordingly
         if departamentos.exists():
-            proyectos = [departamento.proyecto for departamento in departamentos]
-            return Response({'message': 'Datos actualizados correctamente', 'proyectos': proyectos}, status=200)
+            for departamento in departamentos:
+                
+                data.append({
+                    'nombre':departamento.proyecto.nombre,
+                        'id':departamento.proyecto.id,
+                      "slug":departamento.proyecto.slug
+                })
+            # print("Proyectos:", proyectos)
+            return Response({'message': 'Datos actualizados correctamente', 'data': data}, status=200)
         else:
-            return Response({'message': 'Proyecto no encontrado'}, status=404)
+            print("No proyectos found for the given fecha_workshop")
+            return Response({'message': 'Proyecto no encontrado', data:[]}, status=404)
 
     except Exception as e:
         print(f'Error: {e}')

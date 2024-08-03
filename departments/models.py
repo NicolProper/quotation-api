@@ -3,7 +3,6 @@ from proyects.models import Proyecto
 
 class Departamento(models.Model):
     proyecto = models.ForeignKey(Proyecto, on_delete=models.CASCADE)
-    fecha_entrega = models.DateField(null=True, blank=True)
     fecha_actualizacion = models.DateField(null=True, blank=True)
     nro_depa = models.CharField(max_length=200)
     unit_area = models.FloatField( default=1)   
@@ -41,10 +40,12 @@ class Departamento(models.Model):
     )
     nombre = models.CharField(max_length=100, blank=True)
     tipo_departamento= models.CharField(max_length=200, default="")
+    
     precio = models.FloatField(default=0)
-    precio_venta = models.FloatField(default=0)
     precio_dolar = models.FloatField(null=True)
-    precio_lista = models.FloatField(default=0)
+    precio_venta = models.FloatField(default=0)
+    precio_venta_dolar = models.FloatField(default=0)
+    monto_inicial = models.FloatField(default=0)
     estatus = models.CharField(max_length=100, default="no disponible")
     ocultar = models.BooleanField(default=False)
 
@@ -63,7 +64,10 @@ class Departamento(models.Model):
     patrimonio_anio_10 =  models.FloatField(default=0)
     patrimonio_anio_20 =  models.FloatField(default=0)
     patrimonio_anio_30 =  models.FloatField(default=0)
-    tasa =  models.FloatField(default=0)
+
+    # def save(self, *args, **kwargs):
+    #     self.monto_inicial = self.proyecto.valor_porcentaje_inicial * self.precio
+    #     super().save(*args, **kwargs)
 
     def __str__(self):
         return self.nombre
