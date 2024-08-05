@@ -202,6 +202,7 @@ def upload_data_project(request):
             data = json.loads(data_)
             
             nombre = data.get('nombre').lower()
+            nombre_real = data.get('nombre_real').lower()
             texto_sin_tildes = unidecode.unidecode(nombre)
             slug = re.sub(r'\s+', '-', texto_sin_tildes.lower())
             distrito = data.get('distrito').lower()
@@ -244,6 +245,7 @@ def upload_data_project(request):
 
             fields = {
                 "nombre": nombre,
+                "nombre_real":nombre_real,
                 "distrito": distrito,
                 "banco": banco,
                 "fecha_ingreso": fecha_ingreso,
