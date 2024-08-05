@@ -371,7 +371,7 @@ def get_project_by_name(request, nombre):
         proyecto = Proyecto.objects.get(nombre=nombre)
         proyecto_data = {
             'nombre': proyecto.nombre,
-            'nombre_real': proyecto.nombre,
+            'nombre_real': proyecto.nombre_real,
 
             'distrito': proyecto.distrito,
             'banco': proyecto.banco,
