@@ -9,37 +9,61 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # Create your views here.
 
-@api_view(['GET'])
+@api_view(['POST'])
 
-def active_project(request, name_proyecto):
+def active_project(request, nombre):
+    if not nombre:
+        return Response({'error': 'El campo "name_proyecto" es obligatorio'}, status=400)
+
     try:
-        proyecto = Proyecto.objects.filter(nombre=name_proyecto).first()
-        if not proyecto:
-            return Response({"result": False, "message": "Proyecto no encontrado"}, status=404)
+        print(nombre)
+        proyecto = Proyecto.objects.filter(nombre=nombre).first()
+        proyecto.workshop = True
+        proyecto.save()
+        return Response({'message': 'Success'}, status=200)
 
-        # Verificar si ya existe un ProyectoWorkshop para este proyecto
-        existing_workshop = Proyecto_Workshop.objects.filter(proyecto=proyecto).first()
-        if existing_workshop:
-            return Response({"result": True, "id": existing_workshop.id, "message": "ProyectoWorkshop ya existe"}, status=200)
-        
-        nuevo_workshop = Proyecto_Workshop.objects.create(
-            proyecto=proyecto
-        )
+    except Proyecto.DoesNotExist:
+        return Response({'message': 'Something went wrong'}, status=400)
 
-        return Response({"result": True, "id": nuevo_workshop.id, "message": "ProyectoWorkshop creado exitosamente"}, status=201)
+@api_view(['POST'])
+def desactive_project(request, nombre):
+    if not nombre:
+        return Response({'error': 'El campo "nombre" es obligatorio'}, status=400)
 
-    except Exception as e:
-        print(f'Error: {e}')
-        return Response({"result": False, "message": str(e)}, status=500)
+    try:
+        proyecto = Proyecto.objects.filter(nombre=nombre).first()
+        proyecto.workshop = False
+        proyecto.save()
+        return Response({'message': 'Success'}, status=200)
 
-
+    except Proyecto.DoesNotExist:
+        return Response({'message': 'Something went wrong'}, status=400)
+    
+    
 @api_view(['GET'])
 def get_all_projects(request):
-    # Utiliza values_list para obtener solo los nombres de los proyectos
-    departamentos_data = Proyecto_Workshop.objects.values_list('nombre', flat=True)
-
-    # Devolver los departamentos como JSON
-    return Response({'data': list(departamentos_data)})
+    # Parámetro para filtrar por fecha
+    data_ = request.body
+    data = json.loads(data_)
+    print("Received data:", data)
+    
+    # Get fecha_workshop and validate
+    fecha_workshop = data.get('fecha_workshop')
+    
+    try:
+        # Filtrar por fecha_workshop y obtener solo los nombres de los proyectos
+        departamentos_data = Proyecto_Workshop.objects.filter(fecha_workshop=fecha_workshop).values_list('nombre', flat=True)
+        print("Departamentos found:", departamentos_data)
+        
+        if not departamentos_data:
+            print("No proyectos found for the given fecha_workshop")
+            return Response({'data': []})
+        
+        # Devolver los departamentos como JSON
+        return Response({'data': (departamentos_data)})
+    except Exception as e:
+        print("Error:", e)
+        return Response({'error': str(e)}, status=500)
 
 
 
@@ -145,37 +169,30 @@ def update_info_project(request, id):
 @api_view(['POST'])
 def get_all_projects_workshop(request):
     try:
-        # Parse request body
         data_ = request.body
         data = json.loads(data_)
-        print("Received data:", data)
         
         # Get fecha_workshop and validate
         fecha_workshop = data.get('fecha_workshop')
-        if fecha_workshop is not None and pd.isna(fecha_workshop):
-            fecha_workshop = None
-        
-        print("Fecha workshop:", fecha_workshop)
-        
+                
         # Query the database
         departamentos = Departamento_Workshop.objects.filter(fecha_workshop=fecha_workshop).distinct('proyecto')
         print("Departamentos found:", departamentos)
-        data=[]
+        
+        data = []
         # Check if any departamentos exist and respond accordingly
         if departamentos.exists():
             for departamento in departamentos:
-                
                 data.append({
-                    'nombre':departamento.proyecto.nombre,
-                        'id':departamento.proyecto.id,
-                      "slug":departamento.proyecto.slug
+                    'nombre': departamento.proyecto.nombre,
+                    'id': departamento.proyecto.id,
+                    'slug': departamento.proyecto.slug
                 })
-            # print("Proyectos:", proyectos)
             return Response({'message': 'Datos actualizados correctamente', 'data': data}, status=200)
         else:
             print("No proyectos found for the given fecha_workshop")
-            return Response({'message': 'Proyecto no encontrado', data:[]}, status=404)
+            return Response({'message': 'Proyecto no encontrado', 'data': []}, status=201)
 
     except Exception as e:
         print(f'Error: {e}')
-        return Response({'message': 'Error en la carga de datos'}, status=400)
+        return Response({'message': 'Error en la carga de datos', 'data': []}, status=400)
