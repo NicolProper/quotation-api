@@ -87,11 +87,7 @@ def upload_data_proyecto(request):
                 if proyecto_obj:
 
                     proyecto_workshop, created = Proyecto_Workshop.objects.update_or_create(
-                        proyecto=proyecto_obj,
-                        defaults={
-                            'frase': '',
-                            'parrafo': '',
-                        }
+                        proyecto=proyecto_obj
                     )
                     if created:
                         print('Registro creado en project_workshop')
