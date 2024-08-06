@@ -1,5 +1,7 @@
 import json
 from django.http import JsonResponse
+
+from proyects.models import Proyecto
 from .models import Variable
 from rest_framework.decorators import api_view
 
@@ -17,7 +19,10 @@ def create_variable(request):
 
             if not name or value is None:
                 return JsonResponse({'error': 'Name and value are required'}, status=400)
-
+            
+            
+            Proyecto.objects.filter(workshop=True).update(workshop=False)
+            
             # Usar update_or_create para actualizar o crear el registro
             variable, created = Variable.objects.update_or_create(
                 name=name,

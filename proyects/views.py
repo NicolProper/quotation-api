@@ -304,35 +304,46 @@ def upload_data_project(request):
 
 @api_view(['POST'])
 def active_project(request, slug):
-    print(slug)
     if not slug:
-        return Response({'error': 'El campo "slug" es obligatorio'}, status=400)
+        return Response({'message': 'El campo "slug" es obligatorio'}, status=201)
 
     try:
         proyecto = Proyecto.objects.filter(slug=slug).first()
-        print(proyecto)
+        
+        if not proyecto:
+            return Response({'message': 'Proyecto no encontrado'}, status=201)
+        
+        filters_first = {
+            'proyecto': proyecto,
+            'estatus': "disponible",
+            "ocultar": False
+        }
+        
+        departamentos_first = Departamento.objects.filter(**filters_first).exists()
+        
+        if not departamentos_first:
+            return Response({'message': 'No hay departamentos disponibles'}, status=201)
+        
         filters = {
             'proyecto': proyecto,
-            'roi__gt':0,
+            'roi__gt': 0,
             'tir__gt': 0,
             'renta__gt': 0,
             'estatus': "disponible",
-            "ocultar":False
+            "ocultar": False
         }
         
-        departamentos =Departamento.objects.filter(**filters).exists()
-        # tipos_departamento= departamentos.values_list('tipo_departamento', flat=True).distinct()
+        departamentos = Departamento.objects.filter(**filters).exists()
 
         if departamentos:
-        
             proyecto.web = True
             proyecto.save()
             return Response({'message': 'Success'}, status=200)
         else:
-            return Response({'message': 'Not exits Departments avaible'}, status=200)
+            return Response({'message': 'No hay departamentos con índices positivos disponibles'}, status=201)
 
-    except Proyecto.DoesNotExist:
-        return Response({'message': 'Something went wrong'}, status=400)
+    except Exception as e:
+        return Response({'message': 'Algo salió mal', 'details': str(e)}, status=400)
 
         
 

@@ -1,4 +1,5 @@
 import json
+from django.shortcuts import get_object_or_404
 import pandas as pd
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -10,25 +11,35 @@ from rest_framework.response import Response
 # Create your views here.
 
 @api_view(['POST'])
-
 def active_project(request, nombre):
     if not nombre:
-        return Response({'error': 'El campo "name_proyecto" es obligatorio'}, status=400)
+        return Response({'message': 'El campo "nombre" es obligatorio'}, status=400)
 
     try:
-        print(nombre)
-        proyecto = Proyecto.objects.filter(nombre=nombre).first()
+        proyecto = get_object_or_404(Proyecto, nombre=nombre)
+        departments = Departamento_Workshop.objects.filter(proyecto=proyecto)
+        print(len(proyecto.nombre_real))
+        if  not proyecto.nombre_real or len(proyecto.nombre_real) <=1:
+            return Response({'message': 'El proyecto NO cuenta con Nombre Real'}, status=200)
+
+        if not departments.exists():
+            return Response({'message': 'No existen departamentos para workshop'}, status=200)
+
         proyecto.workshop = True
         proyecto.save()
         return Response({'message': 'Success'}, status=200)
 
-    except Proyecto.DoesNotExist:
-        return Response({'message': 'Something went wrong'}, status=400)
+    except Exception as e:
+        # Log unexpected errors for debugging purposes
+        print(f"Unexpected error: {e}")
+        return Response({'message': 'Something went wrong'}, status=500)
+
+
 
 @api_view(['POST'])
 def desactive_project(request, nombre):
     if not nombre:
-        return Response({'error': 'El campo "nombre" es obligatorio'}, status=400)
+        return Response({'message': 'El campo "nombre" es obligatorio'}, status=400)
 
     try:
         proyecto = Proyecto.objects.filter(nombre=nombre).first()
