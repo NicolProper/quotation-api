@@ -241,10 +241,21 @@ def upload_data_project(request):
             plazo_meses = data.get('plazo_meses') if not pd.isna(data.get('plazo_meses')) else None
             descuento_porcentaje_preventa = data.get('descuento_porcentaje_preventa') if not pd.isna(data.get('descuento_porcentaje_preventa')) else None
 
+
+            correo_1 = data.get('correo_1').lower() if not pd.isna(data.get('correo_1')) else None
+            crm = data.get('crm').lower() if not pd.isna(data.get('crm')) else None
+            inmobiliaria = data.get('inmobiliaria').lower() if not pd.isna(data.get('inmobiliaria')) else None
+            persona_contacto_1 = data.get('persona_contacto_1').lower() if not pd.isna(data.get('persona_contacto_1')) else None
+            tipo_envio_leads = data.get('tipo_envio_leads').lower() if not pd.isna(data.get('tipo_envio_leads')) else None
  
 
             fields = {
                 "nombre": nombre,
+                "correo_1":correo_1,
+                "crm":crm,
+                "inmobiliaria":inmobiliaria,
+                "persona_contacto_1": persona_contacto_1,
+                "tipo_envio_leads": tipo_envio_leads,
                 "nombre_real":nombre_real,
                 "distrito": distrito,
                 "banco": banco,
@@ -420,7 +431,11 @@ def get_project_by_name(request, nombre):
             "costo_porcentaje_administrativos_venta":proyecto.costo_porcentaje_administrativos_venta, #costo de cierre
             "coordenada_A":proyecto.coordenada_A if proyecto.coordenada_A else 0,
             "coordenada_B":proyecto.coordenada_B if proyecto.coordenada_B else 0,
-            
+            "correo_1": proyecto.correo_1,
+            "crm": proyecto.crm,
+            "inmobiliaria": proyecto.inmobiliaria,
+            "persona_contacto_1": proyecto.persona_contacto_1,
+            "tipo_envio_leads": proyecto.tipo_envio_leads            
             
             # Agrega más campos según sea necesario
         }
@@ -453,3 +468,53 @@ def updateDepartmentsDisponible(request):
         except Exception as e:
             print(f'error: {e}')
             return Response({'message': 'Error al actualizar los departamentos'}, status=400)
+        
+        
+@api_view(['GET'])
+def get_info_inmobiliaria_project(request, slug):
+    proyecto = Proyecto.objects.filter(slug=slug).first()
+    if proyecto:
+        data = {
+            "correo_1": proyecto.correo_1,
+            "crm": proyecto.crm,
+            "inmobiliaria": proyecto.inmobiliaria,
+            "persona_contacto_1": proyecto.persona_contacto_1,
+            "tipo_envio_leads": proyecto.tipo_envio_leads,
+        }
+        return Response({'data': data})
+    else:
+        return Response({'data': {}}, status=404)
+    
+    
+    
+@api_view(['POST'])
+def update_info_inmobiliaria_project(request, slug):
+    try:
+
+        data_ = request.body
+        data = json.loads(data_)
+        
+        correo_1 = data.get('correo_1').lower() if not pd.isna(data.get('correo_1')) else None
+        crm = data.get('crm').lower() if not pd.isna(data.get('crm')) else None
+        inmobiliaria = data.get('inmobiliaria').lower() if not pd.isna(data.get('inmobiliaria')) else None
+        persona_contacto_1 = data.get('persona_contacto_1').lower() if not pd.isna(data.get('persona_contacto_1')) else None
+        tipo_envio_leads = data.get('tipo_envio_leads').lower() if not pd.isna(data.get('tipo_envio_leads')) else None
+        
+        project = Proyecto.objects.filter(slug=slug).first()
+        
+        
+        if project:
+            project.correo_1 = correo_1
+            project.crm = crm
+            project.inmobiliaria = inmobiliaria
+            project.persona_contacto_1 = persona_contacto_1
+            project.tipo_envio_leads = tipo_envio_leads
+            
+            project.save()
+            return Response({'message': 'Datos actualizados correctamente'}, status=200)
+        else:
+            return Response({'message': 'Proyecto no encontrado'}, status=404)
+
+    except Exception as e:
+        print(f'Error: {e}')
+        return Response({'message': 'Error en la carga de datos'}, status=400)
