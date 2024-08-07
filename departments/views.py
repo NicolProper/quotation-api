@@ -8,6 +8,7 @@ from django.db.models import Q
 import requests
 import unidecode
 
+from analyzer.models import Analyzer
 from informacion.models import Bancaria
 from .models import Departamento
 from .serializers import DepartamentoSerializer
@@ -915,6 +916,8 @@ def getFecha(depa:Departamento):
 @api_view(['GET'])
 def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa, plazoMeses, porcentajeInicial):
     print('ingrese')
+    
+    analyzer=Analyzer.objects.get(id=1)
     departamento = Departamento.objects.get(id=idDepartamento)
     cliente=Bancaria.objects.get(id=idCliente)
     print(cliente.cuota_inicial)
@@ -954,20 +957,20 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa,
         
         "nro_depa": departamento.nro_depa,
 
-        "corretaje": 'si' if departamento.proyecto.corretaje else "no",
+        "corretaje": 'si' if analyzer.corretaje else "no",
         "tasa_int_credito_hip_porc": tasa*100 ,#update
         "descuento_preventa_porc": departamento.proyecto.descuento_porcentaje_preventa*100,
         "plazo_en_meses_cred_hip": plazoMeses, #update
-        "costo_instalar_porc": departamento.proyecto.costo_porcentaje_instalacion*100,
-        "capex_reparaciones_anual_porc": departamento.proyecto.costo_porcentaje_capex_reparaciones*100,
+        "costo_instalar_porc": analyzer.costo_porcentaje_instalacion*100,
+        "capex_reparaciones_anual_porc": analyzer.costo_porcentaje_capex_reparaciones*100,
         "vista": departamento.vista,
         "piso": departamento.piso,
 
 
-        "vacancia_dias_anio": departamento.proyecto.dias_vacancia,
-        "costo_operacional_prom_porc":departamento.proyecto.costo_porcentaje_operativo*100,
-        "costo_de_administracion_porc":departamento.proyecto.costo_porcentaje_administrativo*100,
-        "costos_administrativos_venta_porc":departamento.proyecto.costo_porcentaje_administrativos_venta*100
+        "vacancia_dias_anio": analyzer.dias_vacancia,
+        "costo_operacional_prom_porc":analyzer.costo_porcentaje_operativo*100,
+        "costo_de_administracion_porc":analyzer.costo_porcentaje_administrativo*100,
+        "costos_administrativos_venta_porc":analyzer.costo_porcentaje_administrativos_venta*100
 
         }
         # departamentos_data.append(departamento_data)
@@ -1126,6 +1129,8 @@ def upload_data_department(request):
             patrimonio_anio_20_ = 0
             patrimonio_anio_30_ = 0
 
+            analyzer=Analyzer.objects.get(id=1) 
+            print(analyzer.tasa_credito)
             proyecto_obj = Proyecto.objects.filter(nombre=proyecto).first()
             fecha_entrega_updated = datetime.date.today().replace(day=1) if proyecto_obj and proyecto_obj.etapa == "inmediata" else proyecto_obj.fecha_entrega if proyecto_obj else None
 
@@ -1134,15 +1139,13 @@ def upload_data_department(request):
                 precio_dolar = precio if tipo_moneda == "usd" else 0
 
                 data = analyze_api(
-                    proyecto_obj.tasa_credito, newprecio, valor_alquiler, unit_area, proyecto_obj.valor_porcentaje_inicial, 
-                    fecha_entrega_updated, proyecto_obj.costo_porcentaje_instalacion, proyecto_obj.descuento_porcentaje_preventa, 
-                    proyecto_obj.costo_porcentaje_operativo, proyecto_obj.costo_porcentaje_administrativo, proyecto_obj.corretaje, 
-                    proyecto_obj.plazo_meses, proyecto_obj.dias_vacancia, proyecto_obj.costo_porcentaje_capex_reparaciones, 
-                    proyecto_obj.costo_porcentaje_administrativos_venta,
+                    analyzer.tasa_credito, newprecio, valor_alquiler, unit_area, proyecto_obj.valor_porcentaje_inicial, 
+                    fecha_entrega_updated, analyzer.costo_porcentaje_instalacion, proyecto_obj.descuento_porcentaje_preventa, 
+                    analyzer.costo_porcentaje_operativo, analyzer.costo_porcentaje_administrativo, analyzer.corretaje, 
+                    analyzer.plazo_meses, analyzer.dias_vacancia, analyzer.costo_porcentaje_capex_reparaciones, 
+                    analyzer.costo_porcentaje_administrativos_venta,
                     proyecto_obj.etapa, tipo_moneda)
-                
-                print(data)
-                
+                                
                 print(data['resultado'])
 
                 tir_ = round(data['resultado']['tir'], 8)
@@ -1309,7 +1312,8 @@ def edit_data_department(request):
             patrimonio_anio_10_ = 0
             patrimonio_anio_20_ = 0
             patrimonio_anio_30_ = 0
-
+            
+            analyzer=Analyzer.objects.get(id=1)
             proyecto_obj = Proyecto.objects.filter(nombre=proyecto).first()
             fecha_entrega_updated = datetime.date.today().replace(day=1) if proyecto_obj and proyecto_obj.etapa == "inmediata" else proyecto_obj.fecha_entrega if proyecto_obj else None
 
@@ -1318,11 +1322,11 @@ def edit_data_department(request):
                 precio_dolar = precio if tipo_moneda == "usd" else 0
 
                 data = analyze_api(
-                    proyecto_obj.tasa_credito, newprecio, valor_alquiler, unit_area, proyecto_obj.valor_porcentaje_inicial, 
-                    fecha_entrega_updated, proyecto_obj.costo_porcentaje_instalacion, proyecto_obj.descuento_porcentaje_preventa, 
-                    proyecto_obj.costo_porcentaje_operativo, proyecto_obj.costo_porcentaje_administrativo, proyecto_obj.corretaje, 
-                    proyecto_obj.plazo_meses, proyecto_obj.dias_vacancia, proyecto_obj.costo_porcentaje_capex_reparaciones, 
-                    proyecto_obj.costo_porcentaje_administrativos_venta,
+                    analyzer.tasa_credito, newprecio, valor_alquiler, unit_area, proyecto_obj.valor_porcentaje_inicial, 
+                    fecha_entrega_updated, analyzer.costo_porcentaje_instalacion, proyecto_obj.descuento_porcentaje_preventa, 
+                    analyzer.costo_porcentaje_operativo, analyzer.costo_porcentaje_administrativo, analyzer.corretaje, 
+                    analyzer.plazo_meses, analyzer.dias_vacancia, analyzer.costo_porcentaje_capex_reparaciones, 
+                    analyzer.costo_porcentaje_administrativos_venta,
                     proyecto_obj.etapa, tipo_moneda)
                 
                 print(data['resultado'])

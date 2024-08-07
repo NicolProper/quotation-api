@@ -86,18 +86,19 @@ class Proyecto(models.Model):
     web = models.BooleanField(default=False) 
     bar = models.BooleanField(default=False) 
     # parametros analizer
-    dias_vacancia=models.FloatField(null=False,  default=0)
-    costo_porcentaje_operativo=models.FloatField(null=False,  default=0)
-    costo_porcentaje_administrativo=models.FloatField(null=False,  default=0)
-    costo_porcentaje_instalacion=models.FloatField(null=False,  default=0)
-    corretaje= models.BooleanField(default=False) 
-    tasa_credito= models.FloatField(null=False,  default=0.06)
-    costo_porcentaje_capex_reparaciones=models.FloatField(null=False,  default=0) #gastos de capital
-    plazo_meses = models.IntegerField(default=300)
+    
+    # dias_vacancia=models.FloatField(null=False,  default=0)
+    # costo_porcentaje_operativo=models.FloatField(null=False,  default=0)
+    # costo_porcentaje_administrativo=models.FloatField(null=False,  default=0)
+    # costo_porcentaje_instalacion=models.FloatField(null=False,  default=0)
+    # corretaje= models.BooleanField(default=False) 
+    # tasa_credito= models.FloatField(null=False,  default=0.06)
+    # costo_porcentaje_capex_reparaciones=models.FloatField(null=False,  default=0) #gastos de capital
+    # plazo_meses = models.IntegerField(default=300)
+    # costo_porcentaje_administrativos_venta=models.FloatField(null=False,  default=0) #costo de cierre
+    
     descuento_porcentaje_preventa=models.FloatField(null=False,  default=0)  
-    costo_porcentaje_administrativos_venta=models.FloatField(null=False,  default=0) #costo de cierre
-    
-    
+
     coordenada_A=models.FloatField(null=True)
     coordenada_B=models.FloatField(null=True)
     

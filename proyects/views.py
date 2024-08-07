@@ -86,19 +86,10 @@ def upload_data_excel(request):
                 
                 print('11')
 
-                dias_vacancia=row['dias_vacancia'] if not pd.isna(row['dias_vacancia']) else None
-                costo_porcentaje_operativo=row['costo_porcentaje_operativo'] if not pd.isna(row['costo_porcentaje_operativo']) else None
-                costo_porcentaje_administrativo=row['costo_porcentaje_administrativo'] if not pd.isna(row['costo_porcentaje_administrativo']) else None
-                costo_porcentaje_instalacion=row['costo_porcentaje_instalacion'] if not pd.isna(row['costo_porcentaje_instalacion']) else None
-                corretaje= True if row['corretaje'] == "SI" else False
-                tasa_credito= row['tasa_credito'] if not pd.isna(row['tasa_credito']) else None
-                plazo_meses = row['plazo_meses'] if not pd.isna(row['plazo_meses']) else None
                 descuento_porcentaje_preventa=row['descuento_porcentaje_preventa'] if not pd.isna(row['descuento_porcentaje_preventa']) else None
+
                 coordenada_A=row['coordenada_A'] if not pd.isna(row['coordenada_A']) else None
                 coordenada_B=row['coordenada_B'] if not pd.isna(row['coordenada_B']) else None
-                print(8888888)
-                costo_porcentaje_capex_reparaciones=row['costo_porcentaje_capex_reparaciones'] if not pd.isna(row['costo_porcentaje_capex_reparaciones']) else None
-                costo_porcentaje_administrativos_venta=row['costo_porcentaje_administrativos_venta'] if not pd.isna(row['costo_porcentaje_administrativos_venta']) else None
                 projects_created = []
                
                 fields = {
@@ -129,16 +120,7 @@ def upload_data_excel(request):
 
                     "valor_alquiler": valor_alquiler,
                     "valor_cuota": valor_cuota,
-                    "dias_vacancia":dias_vacancia,
-                    "costo_porcentaje_operativo":costo_porcentaje_operativo,
-                    "costo_porcentaje_administrativo":costo_porcentaje_administrativo,
-                    "costo_porcentaje_instalacion":costo_porcentaje_instalacion,
-                    "corretaje": corretaje,
-                    "tasa_credito": tasa_credito,
-                    "plazo_meses" : plazo_meses,
                     "descuento_porcentaje_preventa":descuento_porcentaje_preventa,
-                    "costo_porcentaje_capex_reparaciones":costo_porcentaje_capex_reparaciones,
-                    "costo_porcentaje_administrativos_venta":costo_porcentaje_administrativos_venta,
                     "coordenada_A":coordenada_A,
                     "coordenada_B":coordenada_B
                     
@@ -228,17 +210,7 @@ def upload_data_project(request):
             coordenada_A = data.get('coordenada_A') if not pd.isna(data.get('coordenada_A')) else None
             coordenada_B = data.get('coordenada_B') if not pd.isna(data.get('coordenada_B')) else None
             
-            
-            dias_vacancia = data.get('dias_vacancia') if not pd.isna(data.get('dias_vacancia')) else None
-            costo_porcentaje_operativo = data.get('costo_porcentaje_operativo') if not pd.isna(data.get('costo_porcentaje_operativo')) else None
-            costo_porcentaje_administrativo = data.get('costo_porcentaje_administrativo') if not pd.isna(data.get('costo_porcentaje_administrativo')) else None
-            costo_porcentaje_instalacion = data.get('costo_porcentaje_instalacion') if not pd.isna(data.get('costo_porcentaje_instalacion')) else None
-            
-            costo_porcentaje_capex_reparaciones = data.get('costo_porcentaje_capex_reparaciones') if not pd.isna(data.get('costo_porcentaje_capex_reparaciones')) else None
-            costo_porcentaje_administrativos_venta = data.get('costo_porcentaje_administrativos_venta') if not pd.isna(data.get('costo_porcentaje_administrativos_venta')) else None
-            corretaje = True if data.get('corretaje') == "SI" else False
-            tasa_credito = data.get('tasa_credito') if not pd.isna(data.get('tasa_credito')) else None
-            plazo_meses = data.get('plazo_meses') if not pd.isna(data.get('plazo_meses')) else None
+        
             descuento_porcentaje_preventa = data.get('descuento_porcentaje_preventa') if not pd.isna(data.get('descuento_porcentaje_preventa')) else None
 
 
@@ -276,20 +248,10 @@ def upload_data_project(request):
                 "etapa": etapa,
                 "nro_pisos": nro_pisos,
                 "nro_dptos": nro_dptos,
-
                 "valor_de_separacion": valor_de_separacion,
                 "valor_porcentaje_inicial": valor_porcentaje_inicial,
                 "valor_porcentaje_financiado": valor_porcentaje_financiado,
-                "dias_vacancia": dias_vacancia,
-                "costo_porcentaje_operativo": costo_porcentaje_operativo,
-                "costo_porcentaje_administrativo": costo_porcentaje_administrativo,
-                "costo_porcentaje_instalacion": costo_porcentaje_instalacion,
-                "corretaje": corretaje,
-                "tasa_credito": tasa_credito,
-                "plazo_meses": plazo_meses,
                 "descuento_porcentaje_preventa": descuento_porcentaje_preventa,
-                "costo_porcentaje_capex_reparaciones": costo_porcentaje_capex_reparaciones,
-                "costo_porcentaje_administrativos_venta": costo_porcentaje_administrativos_venta,
                 "coordenada_A": coordenada_A,
                 "coordenada_B": coordenada_B
             }
@@ -421,16 +383,9 @@ def get_project_by_name(request, nombre):
             "web":  "SI" if proyecto.web else "NO",
             "bar":  "SI" if proyecto.workshop else "NO",
             
-            "dias_vacancia":proyecto.dias_vacancia,
-            "costo_porcentaje_operativo":proyecto.costo_porcentaje_operativo,
-            "costo_porcentaje_administrativo":proyecto.costo_porcentaje_administrativo,
-            "costo_porcentaje_instalacion":proyecto.costo_porcentaje_instalacion,
-            "corretaje": proyecto.corretaje ,
-            "tasa_credito": proyecto.tasa_credito,
-            "costo_porcentaje_capex_reparaciones":proyecto.costo_porcentaje_capex_reparaciones, #gastos de capital
-            "plazo_meses" :proyecto.plazo_meses,
+
             "descuento_porcentaje_preventa":proyecto.descuento_porcentaje_preventa  ,
-            "costo_porcentaje_administrativos_venta":proyecto.costo_porcentaje_administrativos_venta, #costo de cierre
+            
             "coordenada_A":proyecto.coordenada_A if proyecto.coordenada_A else 0,
             "coordenada_B":proyecto.coordenada_B if proyecto.coordenada_B else 0,
             "correo_1": proyecto.correo_1,
