@@ -31,6 +31,7 @@ class Proyecto(models.Model):
     
     
     
+    link_brochure = models.CharField(max_length=500,  default='')
     
 
     class Etapa(models.TextChoices):

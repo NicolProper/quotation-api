@@ -1442,6 +1442,8 @@ def get_typologies_by_project(request, slug):
     except Exception as e:
         print(f'Error: {e}')
         return Response({'message': 'Error al obtener los departamentos', "data": []}, status=500)
+
+
     
     
 @api_view(['GET'])
