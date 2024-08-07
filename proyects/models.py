@@ -11,6 +11,27 @@ class Proyecto(models.Model):
     fecha_ingreso = models.DateField(default="1900-02-01")
     nombre_real = models.CharField(max_length=200,  default='')
     # precio_desde =  models.FloatField(blank=True, default=0)
+    
+    inmobiliaria = models.CharField(max_length=200,  default='')
+    persona_contacto_1 = models.CharField(max_length=200,  default='')
+    correo_1 = models.CharField(max_length=200,  default='')
+    crm = models.CharField(max_length=200,  default='')
+    
+    class Leads(models.TextChoices):
+        CRM = 'crm'
+        CORREO = 'correo'
+        WHATSAPP = 'whatsapp'
+    
+    
+    tipo_envio_leads = models.CharField(
+        max_length=20,
+        choices=Leads.choices,
+        default=Leads.CRM,
+    )
+    
+    
+    
+    
 
     class Etapa(models.TextChoices):
         PLANOS = 'planos'
@@ -49,21 +70,8 @@ class Proyecto(models.Model):
     nro_pisos = models.IntegerField(default=0)
     nro_dptos = models.IntegerField(default=0)   
     valor_de_separacion = models.FloatField(default=0)
-    # valor_inicial = models.FloatField(default=0)
-    # valor_financiado = models.FloatField(default=0)
     valor_porcentaje_inicial = models.FloatField(default=0)
     valor_porcentaje_financiado = models.FloatField(default=0)
-    # area_desde =  models.FloatField(default=1)
-    # area_hasta =  models.FloatField( default=1)
-    # dorms_desde =  models.FloatField( default=1)
-    # dorms_hasta =  models.FloatField( default=1)  
-    # banos_desde =  models.FloatField( default=1)
-    # banos_hasta =  models.FloatField( default=1)
-    # renta = models.FloatField(null=False, default=0)
-    # roi = models.FloatField(null=False,  default=0)
-    # tir = models.FloatField(null=False,  default=0)
-    # valor_alquiler = models.FloatField(null=False,  default=0)
-    # valor_cuota =models.FloatField(null=False,  default=0)
 
     areas_comunes = models.BooleanField(default=False)
     piscina= models.BooleanField(default=False)
@@ -89,6 +97,8 @@ class Proyecto(models.Model):
     costo_porcentaje_administrativos_venta=models.FloatField(null=False,  default=0) #costo de cierre
     coordenada_A=models.FloatField(null=True)
     coordenada_B=models.FloatField(null=True)
+    
+    
     
     
     #coordinadas
