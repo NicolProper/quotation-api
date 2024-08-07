@@ -1434,7 +1434,7 @@ def get_typologies_by_project(request, slug):
         if not proyecto:
             return Response({'message': 'Proyecto no encontrado', "data": []}, status=404)
         
-        departments = Departamento.objects.filter(proyecto=proyecto, estatus="disponible").values('tipo_departamento').distinct()
+        departments = Departamento.objects.filter(proyecto=proyecto).values('tipo_departamento').distinct()
         data=map(lambda x : x['tipo_departamento'], departments)
         # print(list(data))
         return Response({'data': list(data)}, status=200)
