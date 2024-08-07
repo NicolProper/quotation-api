@@ -18,8 +18,7 @@ urlpatterns = [
     path('upload_data/', views.upload_data_excel, name="departamentos_upload"),
     path('getAllDepartamentos/', views.getAllDepas, name="departamentos_get_all"),
     path('update_all_data/', views.update_all_data, name="update_all_data"),
-    path(
-        'info_departamento_proyecto_analyzer/<int:idDepartamento>/<uuid:idCliente>/<float:tasa>/<float:plazoMeses>/<float:porcentajeInicial>/',
+    path('info_departamento_proyecto_analyzer/<int:idDepartamento>/<uuid:idCliente>/<float:tasa>/<float:plazoMeses>/<float:porcentajeInicial>/',
         views.info_departamento_proyecto_analyzer,
         name="info_departamento_proyecto"
     ),

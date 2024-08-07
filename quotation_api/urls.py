@@ -12,5 +12,7 @@ urlpatterns = [
     path('financiamiento/', include('financiamiento.urls')),
     path('proyectos-workshop/', include('project_workshop.urls')),
     path('departamentos-workshop/', include('department_workshop.urls')),
+    path('configuraciones/', include('variables.urls')),
+    path('analyzer/', include('analyzer.urls')),
 
 ]

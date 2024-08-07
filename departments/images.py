@@ -28,7 +28,10 @@ def upload_image_view(request):
         project_name = request.POST.get('project_name')
         file_name = request.POST.get('file_name')
         image_name = file.name
-        url = upload_image(file, project_name, image_name,file_name)
+        if file.size > 10485760:  # 10 MB, ajusta según sea necesario
+            return JsonResponse({'error': 'File too large'}, status=400)
+
+        url = upload_image(file, project_name, image_name, file_name)
         return JsonResponse({'url': url})
 
 

@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'proyects',
     "departments",
     "project_workshop",
-    "department_workshop"
+    "department_workshop",
+    "variables",
+    "analyzer"
 ]
 
 MIDDLEWARE = [
@@ -201,3 +203,8 @@ AWS_DEFAULT_ACL =  None
 AWS_S3_VERIFY = True
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 APPEND_SLASH = False
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
+
+# Tamaño máximo para la carga de datos en bytes (para evitar el uso excesivo de memoria)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
