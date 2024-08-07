@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     "departments",
     "project_workshop",
     "department_workshop",
-    "variables"
+    "variables",
+    "analyzer"
 ]
 
 MIDDLEWARE = [

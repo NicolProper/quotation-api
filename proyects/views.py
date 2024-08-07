@@ -247,7 +247,8 @@ def upload_data_project(request):
             inmobiliaria = data.get('inmobiliaria').lower() if not pd.isna(data.get('inmobiliaria')) else None
             persona_contacto_1 = data.get('persona_contacto_1').lower() if not pd.isna(data.get('persona_contacto_1')) else None
             tipo_envio_leads = data.get('tipo_envio_leads').lower() if not pd.isna(data.get('tipo_envio_leads')) else None
- 
+            link_brochure = data.get('link_brochure').lower() if not pd.isna(data.get('link_brochure')) else None
+
 
             fields = {
                 "nombre": nombre,
@@ -256,6 +257,7 @@ def upload_data_project(request):
                 "inmobiliaria":inmobiliaria,
                 "persona_contacto_1": persona_contacto_1,
                 "tipo_envio_leads": tipo_envio_leads,
+                "link_brochure":link_brochure,
                 "nombre_real":nombre_real,
                 "distrito": distrito,
                 "banco": banco,
@@ -435,7 +437,8 @@ def get_project_by_name(request, nombre):
             "crm": proyecto.crm,
             "inmobiliaria": proyecto.inmobiliaria,
             "persona_contacto_1": proyecto.persona_contacto_1,
-            "tipo_envio_leads": proyecto.tipo_envio_leads            
+            "tipo_envio_leads": proyecto.tipo_envio_leads,
+            "link_brochure":proyecto.link_brochure          
             
             # Agrega más campos según sea necesario
         }
@@ -480,6 +483,7 @@ def get_info_inmobiliaria_project(request, slug):
             "inmobiliaria": proyecto.inmobiliaria,
             "persona_contacto_1": proyecto.persona_contacto_1,
             "tipo_envio_leads": proyecto.tipo_envio_leads,
+            "link_brochure": proyecto.link_brochure
         }
         return Response({'data': data})
     else:
@@ -499,7 +503,8 @@ def update_info_inmobiliaria_project(request, slug):
         inmobiliaria = data.get('inmobiliaria').lower() if not pd.isna(data.get('inmobiliaria')) else None
         persona_contacto_1 = data.get('persona_contacto_1').lower() if not pd.isna(data.get('persona_contacto_1')) else None
         tipo_envio_leads = data.get('tipo_envio_leads').lower() if not pd.isna(data.get('tipo_envio_leads')) else None
-        
+        link_brochure = data.get('link_brochure').lower() if not pd.isna(data.get('link_brochure')) else None
+
         project = Proyecto.objects.filter(slug=slug).first()
         
         
@@ -509,6 +514,7 @@ def update_info_inmobiliaria_project(request, slug):
             project.inmobiliaria = inmobiliaria
             project.persona_contacto_1 = persona_contacto_1
             project.tipo_envio_leads = tipo_envio_leads
+            project.link_brochure=link_brochure
             
             project.save()
             return Response({'message': 'Datos actualizados correctamente'}, status=200)

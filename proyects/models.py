@@ -96,6 +96,8 @@ class Proyecto(models.Model):
     plazo_meses = models.IntegerField(default=300)
     descuento_porcentaje_preventa=models.FloatField(null=False,  default=0)  
     costo_porcentaje_administrativos_venta=models.FloatField(null=False,  default=0) #costo de cierre
+    
+    
     coordenada_A=models.FloatField(null=True)
     coordenada_B=models.FloatField(null=True)
     
