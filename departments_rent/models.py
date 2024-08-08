@@ -3,7 +3,7 @@ from django.db import models
 
 class Departamento_Alquiler(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    nombre = models.CharField(max_length=100,blank=True,  null=True)
+    nombre = models.CharField(max_length=200,unique=True, default='')
     nro_depa =  models.CharField(max_length=50,blank=True)
     codigo =  models.CharField(max_length=50,blank=True)
     slug = models.CharField(max_length=200, default='')
@@ -34,6 +34,8 @@ class Departamento_Alquiler(models.Model):
     )
     precio = models.FloatField(default=0,blank=True)
     precio_dolar = models.FloatField(null=True)
+    precio_venta = models.FloatField(default=0,blank=True)
+    precio_venta_dolar = models.FloatField(null=True)
     nro_dormitorios = models.IntegerField(default=1,blank=True )
     nro_banos = models.IntegerField(default=1, blank=True)
     valor_alquiler = models.FloatField(default=0, blank=True)
@@ -70,7 +72,7 @@ class Departamento_Alquiler(models.Model):
         PLANOS = 'planos'
         PREVENTA = 'preventa'
         CONSTRUCCION = 'construccion'
-        ENTREGA_INMEDIATA = 'entrega inmediata'
+        ENTREGA_INMEDIATA = 'inmediata'
 
     etapa = models.CharField(
         max_length=20,
@@ -85,10 +87,9 @@ class Departamento_Alquiler(models.Model):
     parrilla = models.BooleanField(default=False)
     sum = models.BooleanField(default=False)
     bicicleta = models.BooleanField(default=False)
-    workshop = models.BooleanField(default=False) 
     web = models.BooleanField(default=False) 
     bar = models.BooleanField(default=False) 
-
+    monto_inicial = models.FloatField(default=0)
     
     
         # parametros analizer

@@ -15,5 +15,6 @@ class FloatConverter:
 register_converter(FloatConverter, 'float')
 # get_project_by_name
 urlpatterns = [
+    path('create-update/', views.upload_data_department_rent, name="upload_data_department"),
 
 ]

@@ -1,4 +1,5 @@
 
+import json
 import re
 from django.shortcuts import get_object_or_404
 import requests
@@ -302,3 +303,165 @@ def entrega_inmedita_profile(reques, slug):
     
     # Aquí obtienes tus proyectos, probablemente desde la base de datos
     # return Response(proyecto)
+def ocultarDef(data):
+    if not pd.isna(data):
+        return True  if data.lower() =="ocultar" else False
+    else: 
+        return None
+
+@api_view(['POST'])
+def upload_data_department_rent(request):
+    if request.method == 'POST':
+        try:
+            data_ = request.body
+            data = json.loads(data_)
+            
+            nombre = str(data.get('nombre')) if not pd.isna(data.get('nombre')) else None
+            nro_depa = nombre
+            tipo_inventario = "c/inquilino"
+            tipo_moneda = data.get('tipo_moneda').lower() if not pd.isna(data.get('tipo_moneda')) else None
+            vista = data.get('vista').lower() if not pd.isna(data.get('vista')) else None
+            estatus = data.get('estatus').lower() if not pd.isna(data.get('estatus')) else None
+            ocultar = ocultarDef(data.get('ocultar'))
+            nro_dormitorios = data.get('nro_dormitorios') if not pd.isna(data.get('nro_dormitorios')) else None
+            nro_banos = data.get('nro_banos') if not pd.isna(data.get('nro_banos')) else None
+            piso = data.get('piso') if not pd.isna(data.get('piso')) else None
+            valor_alquiler = data.get('valor_alquiler') if not pd.isna(data.get('valor_alquiler')) else None
+            unit_area = data.get('unit_area') if not pd.isna(data.get('unit_area')) else None
+            precio = data.get('precio') if not pd.isna(data.get('precio')) else None
+            precio_venta = data.get('precio_venta') if not pd.isna(data.get('precio_venta')) else None
+            fecha_ingreso = data.get('fecha_ingreso') if not pd.isna(data.get('fecha_ingreso')) else None
+            fecha_actualizacion = data.get('fecha_actualizacion') if not pd.isna(data.get('fecha_actualizacion')) else None
+            edificio = data.get('edificio').lower() if not pd.isna(data.get('edificio')) else None
+            anio_construccion = data.get('anio_construccion').lower() if not pd.isna(data.get('anio_construccion')) else None
+            distrito = data.get('distrito').lower() if not pd.isna(data.get('distrito')) else None
+            valor_porcentaje_inicial = data.get('valor_porcentaje_inicial') if not pd.isna(data.get('valor_porcentaje_inicial')) else None
+            valor_porcentaje_financiado = data.get('valor_porcentaje_financiado') if not pd.isna(data.get('valor_porcentaje_financiado')) else None
+            etapa = "inmediata"
+            areas_comunes = True if data.get('areas_comunes') == "SI" else False
+            piscina = True if data.get('piscina') == "SI" else False
+            gym = True if data.get('gym') == "SI" else False
+            coworking = True if data.get('coworking') == "SI" else False
+            cine = True if data.get('cine') == "SI" else False
+            parrilla = True if data.get('parrilla') == "SI" else False
+            sum = True if data.get('sum') == "SI" else False
+            bicicleta = True if data.get('bicicleta') == "SI" else False
+            bar = True if data.get('bar') == "SI" else False
+            web = True
+            descuento_porcentaje_preventa=0
+            coordenada_A = data.get('coordenada_A') if not pd.isna(data.get('coordenada_A')) else None
+            coordenada_B = data.get('coordenada_B') if not pd.isna(data.get('coordenada_B')) else None
+            
+
+
+            tir_ = 0
+            roi_ = 0
+            valor_cuota_ = 0
+            renta_ = 0
+            patrimonio_inicial_ = 0
+            patrimonio_anio_5_ = 0
+            patrimonio_anio_10_ = 0
+            patrimonio_anio_20_ = 0
+            patrimonio_anio_30_ = 0
+
+            analyzer=Analyzer.objects.get(id=1) 
+            
+            fecha_entrega_updated = datetime.date.today().replace(day=1) 
+
+            if precio and valor_alquiler and unit_area and valor_porcentaje_inicial and fecha_entrega_updated:
+                new_precio = precio * 3.8 if tipo_moneda == "usd" else precio
+                new_precio_dolar = precio if tipo_moneda == "usd" else 0
+                
+                new_precio_venta = precio_venta * 3.8 if tipo_moneda == "usd" else precio_venta
+                new_precio_venta_dolar = precio_venta if tipo_moneda == "usd" else 0
+                monto_inicial= new_precio*valor_porcentaje_inicial
+
+                data = analyze_api(
+                    analyzer.tasa_credito, new_precio, valor_alquiler, unit_area, valor_porcentaje_inicial, 
+                    fecha_entrega_updated, analyzer.costo_porcentaje_instalacion, descuento_porcentaje_preventa, 
+                    analyzer.costo_porcentaje_operativo, analyzer.costo_porcentaje_administrativo, analyzer.corretaje, 
+                    analyzer.plazo_meses, analyzer.dias_vacancia, analyzer.costo_porcentaje_capex_reparaciones, 
+                    analyzer.costo_porcentaje_administrativos_venta,
+                    etapa, tipo_moneda)
+                                
+                print(data['resultado'])
+
+                tir_ = round(data['resultado']['tir'], 8)
+                roi_ = round(data['resultado']['roi'], 8)
+                renta_ = round(data['resultado']['renta'], 8)
+                valor_cuota_ = round(data['resultado']['valor_cuota'], 8)
+                patrimonio_inicial_ = round(data['resultado']['patrimonio_inicial'], 8)
+                patrimonio_anio_5_ = round(data['resultado']['patrimonio_anio_5'], 8)
+                patrimonio_anio_10_ = round(data['resultado']['patrimonio_anio_10'], 8)
+                patrimonio_anio_20_ = round(data['resultado']['patrimonio_anio_20'], 8)
+                patrimonio_anio_30_ = round(data['resultado']['patrimonio_anio_30'], 8)
+
+            fields = {
+                "areas_comunes": areas_comunes,
+                "etapa": etapa,
+                "valor_porcentaje_inicial": valor_porcentaje_inicial,
+                "valor_porcentaje_financiado":valor_porcentaje_financiado,
+                "distrito": distrito,
+                "anio_construccion": anio_construccion,
+                "edificio":edificio,
+                'ocultar':ocultar,
+                'nombre': nombre,
+                "fecha_ingreso":fecha_ingreso,
+                "fecha_actualizacion": fecha_actualizacion,
+                "estatus": estatus,
+                'nro_depa': nro_depa,
+                'unit_area': unit_area,
+                'nro_dormitorios': nro_dormitorios,
+                'nro_banos': nro_banos,
+                'valor_alquiler': valor_alquiler,
+                'piso': piso,
+                'vista': vista,
+                'precio': new_precio,
+                "precio_dolar": new_precio_dolar,
+                "precio_venta":new_precio_venta,
+                "precio_venta_dolar": new_precio_venta_dolar,
+                'descuento_porcentaje_preventa': descuento_porcentaje_preventa,
+                'tipo_moneda': tipo_moneda,
+                "tipo_inventario": tipo_inventario,
+                'patrimonio_inicial': patrimonio_inicial_,
+                "patrimonio_anio_5": patrimonio_anio_5_,
+                "patrimonio_anio_10": patrimonio_anio_10_,
+                'patrimonio_anio_20': patrimonio_anio_20_,
+                'patrimonio_anio_30': patrimonio_anio_30_,
+                "tir": tir_,
+                "roi": roi_,
+                "valor_cuota": valor_cuota_,
+                "renta": renta_,
+                "areas_comunes" :areas_comunes,
+                "piscina":piscina,
+                "gym" :gym,
+                "coworking" :coworking,
+                "cine" :cine,
+                "parrilla" :parrilla,
+                "sum" :sum,
+                "bicicleta" :bicicleta,
+                "bar":bar,
+                "web" :web,
+                "coordenada_A" :coordenada_A,
+                "coordenada_B" :coordenada_B,
+                "monto_inicial":monto_inicial
+            }
+
+            fields_not_none = {key: value for key, value in fields.items() if value is not None}
+
+            if fields_not_none:
+                departamento, created = Departamento_Alquiler.objects.update_or_create(
+                    nombre=fields_not_none['nombre'],
+                    defaults=fields_not_none
+                )
+                if created:
+                    return Response({'message': 'Departamento Cargado'}, status=200)
+                else:
+                    return Response({'message': 'Departamento Actualizado'}, status=200)
+
+        except KeyError:
+            return Response({'message': 'Archivo no válido'}, status=400)
+        except pd.errors.EmptyDataError:
+            return Response({'message': 'El archivo está vacío'}, status=400)
+        except Exception as e:
+            return Response({'message': str(e)}, status=500)
