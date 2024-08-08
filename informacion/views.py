@@ -26,13 +26,15 @@ class BancariaViewSet(viewsets.ModelViewSet):
 
 
 
-def crear_usuario(nombre, apellido,dni, cuota_hipotecaria,  edad, residencia, ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral):
+def crear_usuario(nombre,dni, cuota_hipotecaria,  edad, residencia, ingreso_primera_categoria, ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria, ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral, apellido_materno, apellido_paterno, fecha_nacimiento ):
     # Verificar si ya existe un usuario con el mismo DNI
     if Bancaria.objects.filter(dni=dni).exists():
         raise ValueError("Ya existe un usuario con este DNI.")
 
     # Crear un nuevo usuario
-    nuevo_usuario = Bancaria(nombre=nombre,apellido=apellido, dni=dni, cuota_hipotecaria=cuota_hipotecaria,  edad=edad, residencia=residencia, ingreso_primera_categoria=ingreso_primera_categoria, ingreso_segunda_categoria=ingreso_segunda_categoria, ingreso_tercera_categoria=ingreso_tercera_categoria, ingreso_cuarta_categoria=ingreso_cuarta_categoria, ingreso_quinta_categoria=ingreso_quinta_categoria, primera_vivienda=primera_vivienda, cuota_vehicular=cuota_vehicular, cuota_personal=cuota_personal, cuota_tarjeta_credito=cuota_tarjeta_credito, cuota_inicial=cuota_inicial, continuidad_laboral=continuidad_laboral)
+    nuevo_usuario = Bancaria(nombre=nombre, dni=dni, cuota_hipotecaria=cuota_hipotecaria,  edad=edad, residencia=residencia, ingreso_primera_categoria=ingreso_primera_categoria, ingreso_segunda_categoria=ingreso_segunda_categoria, ingreso_tercera_categoria=ingreso_tercera_categoria, ingreso_cuarta_categoria=ingreso_cuarta_categoria, ingreso_quinta_categoria=ingreso_quinta_categoria, primera_vivienda=primera_vivienda, cuota_vehicular=cuota_vehicular, cuota_personal=cuota_personal, cuota_tarjeta_credito=cuota_tarjeta_credito, cuota_inicial=cuota_inicial, continuidad_laboral=continuidad_laboral,
+                              apellido_materno=apellido_materno, apellido_paterno=apellido_paterno, fecha_nacimiento=fecha_nacimiento 
+                             )
     nuevo_usuario.save()
 
     return nuevo_usuario
@@ -45,7 +47,9 @@ def crear_usuario_view(request):
         data_ = request.body
         data = json.loads(data_)
         nombre= data.get('nombre')
-        apellido= data.get('apellido')
+        apellido_materno= data.get('apellido_materno')
+        apellido_paterno= data.get('apellido_paterno')
+        fecha_nacimiento= data.get('fecha_nacimiento')
         dni=data.get('dni')
         edad=data.get('edad')
         residencia= data.get('residencia') #Perú , Extranjero
@@ -63,7 +67,8 @@ def crear_usuario_view(request):
         continuidad_laboral=data.get('continuidad_laboral')
 
         try:
-            usuario_creado = crear_usuario(nombre,apellido, dni, cuota_hipotecaria, edad, residencia, ingreso_primera_categoria,ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria , ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral)
+            usuario_creado = crear_usuario(nombre, dni, cuota_hipotecaria, edad, residencia, ingreso_primera_categoria,ingreso_segunda_categoria, ingreso_tercera_categoria, ingreso_cuarta_categoria , ingreso_quinta_categoria, primera_vivienda, cuota_vehicular, cuota_personal, cuota_tarjeta_credito, cuota_inicial, continuidad_laboral,
+            apellido_materno, apellido_paterno, fecha_nacimiento )
             return JsonResponse({'mensaje': 'Usuario creado exitosamente', 'id': usuario_creado.id}, status=201)
         except ValueError as e:
             return JsonResponse({'mensaje': str(e)}, status=201)
@@ -95,9 +100,10 @@ def actualizar_usuario_view(request, dni):
     model = {
         "id":usuario.id,
         "nombre": usuario.nombre,
-        "apellido": usuario.apellido,
+        "apellido_paterno": usuario.apellido_paterno,
+        "apellido_materno": usuario.apellido_materno,
         "dni": usuario.dni,
-        "edad": int(usuario.edad),
+        "fecha_nacimiento": usuario.fecha_nacimiento,
         "residencia": usuario.residencia,
         "ingreso_primera_categoria": float(usuario.ingreso_primera_categoria),
         "ingreso_segunda_categoria": float(usuario.ingreso_segunda_categoria),

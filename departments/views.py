@@ -405,7 +405,8 @@ def calcular_van(pago_periodico, tasa_interes, valor_presente):
     
     return van
 
-def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial,asesor):
+def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, 
+    apellido_paterno,apellido_materno, dni, valor_porcentaje_inicial,asesor):
     constants = [
                     [ 'bcp', 'ibk', 'bbva', 'pichincha', 'banbif', 'scotiabank'],
                     [ 1, 0.2, 1, 1, 1, 1],
@@ -453,7 +454,7 @@ def calculate_cell_value(cell_value, dataIngresos, plazo, tasa, total_deudas, va
     print({cell_value:{"financiamiento":real_value, "data_ingreso": data_ingreso, "capacidad_endeudamiento": capacidad_endeudamiento, "total_deudas": total_deudas, "cuota_maxima":cuota_maxima, "interes": tasa, "plazo_meses": plazo }})
     
     nuevo_financiamiento=Cliente(fecha=datetime.date.today(), 
-                                             nombre=nombre, apellido=apellido, dni=dni, 
+                                             nombre=nombre, apellido_paterno=apellido_paterno, apellido_materno=apellido_materno, dni=dni, 
                                              ingresos=data_ingreso,
                                              deudas=total_deudas, tasa_interes=tasa, plazo_meses=plazo, valor_porcentaje_inicial=valor_porcentaje_inicial,valor_porcentaje_capacidad_deuda=valor_porcentaje_endeudamiento,
                                              banco=cell_value,
@@ -546,7 +547,9 @@ def get_score_crediticio(request):
 
             
             nombre= data.get('nombre')
-            apellido= data.get('apellido')
+            apellido_materno= data.get('apellido_materno')
+            apellido_paterno= data.get('apellido_paterno')
+
             asesor= data.get('asesor')
             dni=data.get('dni')
             edad=data.get('edad')
@@ -574,7 +577,7 @@ def get_score_crediticio(request):
             # ingreso_solo_tercera_categoria= getIngresoSoloTerceraCategoria(ingreso_primera_categoria, ingreso_segunda_categoria,ingreso_tercera_categoria , ingreso_cuarta_categoria,ingreso_quinta_categoria)
             
             # TOTAL DEUDAS
-            total_deudas=total_deudas + cuota_hipotecaria 
+            total_deudas=total_deudas + cuota_hipotecaria +cuota_vehicular/2
             # + cuota_vehicular+cuota_personal + cuota_tarjeta_credito
                
             # EDAD
@@ -593,12 +596,12 @@ def get_score_crediticio(request):
             ]
       
             
-            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial,asesor)
-            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial,asesor)
-            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial,asesor)
-            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial,asesor)
-            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial,asesor)
-            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido, dni, valor_porcentaje_inicial,asesor)
+            BCP = calculate_cell_value('bcp', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento, nombre, apellido_paterno,apellido_materno, dni, valor_porcentaje_inicial,asesor)
+            IBK = calculate_cell_value('ibk',dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido_paterno,apellido_materno, dni, valor_porcentaje_inicial,asesor)
+            BBVA = calculate_cell_value('bbva', dataIngresos, plazo_meses, tasa,total_deudas, valor_porcentaje_endeudamiento, nombre, apellido_paterno,apellido_materno, dni, valor_porcentaje_inicial,asesor)
+            PICHINCHA = calculate_cell_value('pichincha', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido_paterno,apellido_materno, dni, valor_porcentaje_inicial,asesor)
+            BANBIF = calculate_cell_value('banbif', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido_paterno,apellido_materno, dni, valor_porcentaje_inicial,asesor)
+            SCOTIABANK = calculate_cell_value('scotiabank', dataIngresos, plazo_meses, tasa, total_deudas, valor_porcentaje_endeudamiento, nombre, apellido_paterno,apellido_materno, dni, valor_porcentaje_inicial,asesor)
             
             print(BCP)
             
