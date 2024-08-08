@@ -1143,7 +1143,7 @@ def upload_data_department(request):
                     analyzer.costo_porcentaje_administrativos_venta,
                     proyecto_obj.etapa, tipo_moneda)
                                 
-                print(data['resultado'])
+                print(data)
 
                 tir_ = round(data['resultado']['tir'], 8)
                 roi_ = round(data['resultado']['roi'], 8)

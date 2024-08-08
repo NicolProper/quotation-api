@@ -8,6 +8,9 @@ class Bancaria(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     nombre = models.CharField(max_length=200)
     apellido =models.CharField(max_length=200)
+    apellido_materno =models.CharField(max_length=200, default='')
+    apellido_paterno =models.CharField(max_length=200, default='')
+    fecha_nacimiento = models.DateField(default="2000-02-01")
     dni = models.CharField(max_length=20, null=False)
     edad = models.IntegerField(null=False,  default=0)
 
