@@ -23,6 +23,8 @@ class Departamento_Alquiler(models.Model):
         default=Moneda.SOLES,
     )
     estatus = models.CharField(max_length=100, default="no disponible")
+    ocultar = models.BooleanField(default=False)
+
     class TIPO_INVENTARIO(models.TextChoices):
         PROYECTO = 'proyecto'
         CINQUILINO = 'c/inquilino'

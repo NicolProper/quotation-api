@@ -317,6 +317,8 @@ def upload_data_department_rent(request):
             data = json.loads(data_)
             
             nombre = str(data.get('nombre')) if not pd.isna(data.get('nombre')) else None
+            texto_sin_tildes = unidecode.unidecode(nombre)    
+            slug =  re.sub(r'\s+', '-', texto_sin_tildes.lower())
             nro_depa = nombre
             tipo_inventario = "c/inquilino"
             tipo_moneda = data.get('tipo_moneda').lower() if not pd.isna(data.get('tipo_moneda')) else None
@@ -333,7 +335,7 @@ def upload_data_department_rent(request):
             fecha_ingreso = data.get('fecha_ingreso') if not pd.isna(data.get('fecha_ingreso')) else None
             fecha_actualizacion = data.get('fecha_actualizacion') if not pd.isna(data.get('fecha_actualizacion')) else None
             edificio = data.get('edificio').lower() if not pd.isna(data.get('edificio')) else None
-            anio_construccion = data.get('anio_construccion').lower() if not pd.isna(data.get('anio_construccion')) else None
+            anio_construccion = data.get('anio_construccion') if not pd.isna(data.get('anio_construccion')) else None
             distrito = data.get('distrito').lower() if not pd.isna(data.get('distrito')) else None
             valor_porcentaje_inicial = data.get('valor_porcentaje_inicial') if not pd.isna(data.get('valor_porcentaje_inicial')) else None
             valor_porcentaje_financiado = data.get('valor_porcentaje_financiado') if not pd.isna(data.get('valor_porcentaje_financiado')) else None
@@ -366,15 +368,16 @@ def upload_data_department_rent(request):
 
             analyzer=Analyzer.objects.get(id=1) 
             
-            fecha_entrega_updated = datetime.date.today().replace(day=1) 
-
-            if precio and valor_alquiler and unit_area and valor_porcentaje_inicial and fecha_entrega_updated:
-                new_precio = precio * 3.8 if tipo_moneda == "usd" else precio
-                new_precio_dolar = precio if tipo_moneda == "usd" else 0
-                
-                new_precio_venta = precio_venta * 3.8 if tipo_moneda == "usd" else precio_venta
-                new_precio_venta_dolar = precio_venta if tipo_moneda == "usd" else 0
-                monto_inicial= new_precio*valor_porcentaje_inicial
+            fecha_entrega_updated = date.today().replace(day=1) 
+            new_precio = precio * 3.8 if tipo_moneda == "usd" else precio
+            new_precio_dolar = precio if tipo_moneda == "usd" else 0
+            
+            new_precio_venta = precio_venta * 3.8 if tipo_moneda == "usd" else precio_venta
+            new_precio_venta_dolar = precio_venta if tipo_moneda == "usd" else 0
+            monto_inicial= new_precio*valor_porcentaje_inicial
+            
+            
+            if new_precio and valor_alquiler and unit_area and valor_porcentaje_inicial and fecha_entrega_updated:
 
                 data = analyze_api(
                     analyzer.tasa_credito, new_precio, valor_alquiler, unit_area, valor_porcentaje_inicial, 
@@ -397,6 +400,7 @@ def upload_data_department_rent(request):
                 patrimonio_anio_30_ = round(data['resultado']['patrimonio_anio_30'], 8)
 
             fields = {
+                "slug": slug,
                 "areas_comunes": areas_comunes,
                 "etapa": etapa,
                 "valor_porcentaje_inicial": valor_porcentaje_inicial,

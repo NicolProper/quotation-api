@@ -6,7 +6,7 @@ from django.urls import include, path, register_converter
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('departamentos/', include('departments.urls')),
-    path('departmentos-alquiler/', include('departments_rent.urls')),
+    path('departamentos-alquiler/', include('departments_rent.urls')),
     path('proyectos/', include('proyects.urls')),
     path('usuarios/', include('informacion.urls')),
     path('cotizacion/', include('cotizaciones.urls')),
