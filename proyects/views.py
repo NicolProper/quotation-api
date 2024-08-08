@@ -170,7 +170,22 @@ def get_all_proyects_web(reques):
         
 
 
+def getDescuentoPreventa(etapa, fecha_entrega):
+    # Convert the fecha_entrega string (e.g., "01-09-2024") to a datetime object
 
+    fecha_entrega =  datetime.datetime.strptime(fecha_entrega, '%Y-%m-%d') if fecha_entrega else datetime.datetime.now()
+    current_date = datetime.datetime.now()
+
+    if (fecha_entrega - current_date).days <= 180:  # 6 months = 180 days
+        return 0.05
+    elif etapa == "preventa" or etapa == "planos":
+        return 0.15
+    elif etapa == "construccion":
+        return 0.10
+    elif etapa == "inmediata":
+        return 0
+    return 0
+    
             
               
         
@@ -210,10 +225,9 @@ def upload_data_project(request):
             coordenada_A = data.get('coordenada_A') if not pd.isna(data.get('coordenada_A')) else None
             coordenada_B = data.get('coordenada_B') if not pd.isna(data.get('coordenada_B')) else None
             
-        
-            descuento_porcentaje_preventa = data.get('descuento_porcentaje_preventa') if not pd.isna(data.get('descuento_porcentaje_preventa')) else None
-
-
+            print(fecha_entrega)
+            descuento_porcentaje_preventa =getDescuentoPreventa(etapa, fecha_entrega)  if etapa and fecha_entrega else 0 
+            print(descuento_porcentaje_preventa)
             correo_1 = data.get('correo_1').lower() if not pd.isna(data.get('correo_1')) else None
             crm = data.get('crm').lower() if not pd.isna(data.get('crm')) else None
             inmobiliaria = data.get('inmobiliaria').lower() if not pd.isna(data.get('inmobiliaria')) else None
