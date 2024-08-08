@@ -150,7 +150,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 STATIC_URL = 'static/'
 CORS_ALLOWED_ORIGINS = [
-"http://localhost:3000"
+    "http://localhost:3000",
+    "https://develop.d2cbhjeblvtqb4.amplifyapp.com",
 ]
 CORS_ALLOW_METHODS = [
     'DELETE',
