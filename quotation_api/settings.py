@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-ra@6#@-i180&p6ep^6jilfvp&mo#sc7@e-l@98r!))#oe3iutg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [    "http://localhost:3000","localhost", "127.0.0.1","98jz8fku6f.execute-api.us-east-2.amazonaws.com", "ta1fvfcr52.execute-api.us-east-2.amazonaws.com"]
+ALLOWED_HOSTS = [ "*",   "http://localhost:3000","localhost", "127.0.0.1","98jz8fku6f.execute-api.us-east-2.amazonaws.com", "ta1fvfcr52.execute-api.us-east-2.amazonaws.com", "8sv61pfob7.execute-api.us-east-2.amazonaws.com"]
 
 
 # Application definition
@@ -150,7 +150,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 STATIC_URL = 'static/'
 CORS_ALLOWED_ORIGINS = [
-"http://localhost:3000"
+    "http://localhost:3000",
+    "https://develop.d2cbhjeblvtqb4.amplifyapp.com",
 ]
 CORS_ALLOW_METHODS = [
     'DELETE',
