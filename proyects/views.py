@@ -173,7 +173,7 @@ def get_all_proyects_web(reques):
 def getDescuentoPreventa(etapa, fecha_entrega):
     # Convert the fecha_entrega string (e.g., "01-09-2024") to a datetime object
 
-    fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%Y-%m-%d')
+    fecha_entrega =  datetime.datetime.strptime(fecha_entrega, '%Y-%m-%d') if fecha_entrega else datetime.datetime.now()
     current_date = datetime.datetime.now()
 
     if (fecha_entrega - current_date).days <= 180:  # 6 months = 180 days
