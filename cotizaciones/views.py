@@ -44,12 +44,10 @@ def crear_cotizacion(request):
         correo_asesor=data.get('correo_asesor')
         cliente=data.get('cliente')
         dni= data.get('dni') 
-        proyecto=None
-        # proyecto=Proyecto.objects.get(id=data.get('proyecto')) if data.get('proyecto')!=0 else None
+        proyecto= data.get('proyecto')  if not pd.isna(data.get('proyecto'))    else None    
         proyecto_nombre=data.get('proyecto_nombre')
-        # departamento=Departamento.objects.get(id=data.get('departamento')) if not data.get('departamento')!=0 else None
         departamento_nro=data.get('departamento_nro')
-        departamento=None
+        departamento=data.get('departamento')  if not pd.isna(data.get('departamento'))  else None   
         print(fecha, asesor, correo_asesor,cliente, dni, proyecto, proyecto_nombre, departamento, departamento_nro)
 
         try:
