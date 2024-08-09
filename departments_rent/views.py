@@ -12,6 +12,9 @@ import pandas as pd
 import xlwings as xw
 from departments_rent.models import Departamento_Alquiler
 from datetime import date, datetime
+from dateutil.relativedelta import relativedelta
+
+from informacion.models import Bancaria
 
 
 
@@ -469,3 +472,84 @@ def upload_data_department_rent(request):
             return Response({'message': 'El archivo está vacío'}, status=400)
         except Exception as e:
             return Response({'message': str(e)}, status=500)
+
+
+# def getFecha(depa:Departamento_Alquiler):
+
+#     # nueva_fecha = fecha_actual - relativedelta(months=1)
+    
+#     if depa.etapa=="inmediata":
+#         return date.today().replace(day=1)
+
+#     elif  depa.etapa=="planos" or depa.etapa=="construccion" or depa.etapa=="preventa":
+#         return date.today().replace(day=1) ,
+    
+#     else:
+#         return depa.fecha_entrega
+
+
+
+@api_view(['GET'])
+def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa, plazoMeses, porcentajeInicial):
+    print('_____________')
+    
+    analyzer=Analyzer.objects.get(id=1)
+    departamento_alquiler = Departamento_Alquiler.objects.get(id=idDepartamento)
+    cliente=Bancaria.objects.get(id=idCliente)
+    print(cliente.cuota_inicial)
+    # print(departamento.precio_venta)
+    # print(departamento.proyecto.valor_porcentaje_inicial)
+   # Obtener la fecha actual
+
+    
+    departamento_data = {
+        "proyecto": departamento_alquiler.nombre.upper(),
+        "nombre_proyecto": departamento_alquiler.nombre,
+        "etapa":  departamento_alquiler.etapa,
+        "idProyecto":  departamento_alquiler.id,
+        "tipologia":  departamento_alquiler.tipo_departamento,
+        "numero_depa":  departamento_alquiler.nombre,
+        "valor_inmueble":departamento_alquiler.precio_venta if departamento_alquiler.tipo_moneda=="pen" else departamento_alquiler.precio_venta*3.8, #update
+        "tipo_moneda": departamento_alquiler.tipo_moneda,
+        "precio_lista": departamento_alquiler.precio,
+        "inicial_porc": porcentajeInicial if porcentajeInicial >= departamento_alquiler.valor_porcentaje_inicial*100 else departamento_alquiler.valor_porcentaje_inicial*100 , #update
+        "fecha_entrega":  date.today().replace(day=1) ,
+        "alcabala": 'no',
+        "apreciacion_anual_porc": 3,
+        "costo_administracion_porc": 0,
+        "meses_de_gracia": 0,
+        "renta_mensual": departamento_alquiler.valor_alquiler,
+        "seguro_desgravamen_mensual_porc": 0.0281,
+        "meses_dobles": {
+            "mes1": "-1",
+            "mes2": "-1"
+        },
+        "seguro_todo_riesgo_mensual_porc": 0.02,
+        "fecha_del_prestamo": date.today().replace(day=1) ,
+        "tamanio_m2":departamento_alquiler.unit_area,
+        "nro_habitaciones": departamento_alquiler.nro_dormitorios,
+        "nro_banos": departamento_alquiler.nro_banos,
+        "url": "https://proyects-image.s3.us-east-2.amazonaws.com/" + departamento_alquiler.slug + "/areas_comunes/" + "FACHADA" + ".jpg",
+        "brochure": "",
+        "nro_depa": departamento_alquiler.nro_depa,
+
+        "corretaje": 'si' if analyzer.corretaje else "no",
+        "tasa_int_credito_hip_porc": tasa*100 ,#update
+        "descuento_preventa_porc": departamento_alquiler.descuento_porcentaje_preventa*100,
+        "plazo_en_meses_cred_hip": plazoMeses, #update
+        "costo_instalar_porc": analyzer.costo_porcentaje_instalacion*100,
+        "capex_reparaciones_anual_porc": analyzer.costo_porcentaje_capex_reparaciones*100,
+        "vista": departamento_alquiler.vista,
+        "piso": departamento_alquiler.piso,
+
+
+        "vacancia_dias_anio": analyzer.dias_vacancia,
+        "costo_operacional_prom_porc":analyzer.costo_porcentaje_operativo*100,
+        "costo_de_administracion_porc":analyzer.costo_porcentaje_administrativo*100,
+        "costos_administrativos_venta_porc":analyzer.costo_porcentaje_administrativos_venta*100
+
+        }
+        # departamentos_data.append(departamento_data)
+    
+    # Devolver los departamentos como JSON
+    return Response({'data': departamento_data})

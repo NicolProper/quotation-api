@@ -9,6 +9,7 @@ import requests
 import unidecode
 
 from analyzer.models import Analyzer
+from departments_rent.models import Departamento_Alquiler
 from informacion.models import Bancaria
 from .models import Departamento
 from .serializers import DepartamentoSerializer
@@ -789,7 +790,8 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                                 "bono": BONO,
                                 "monto_inicial": MONTO_INICAL ,
                                 "monto_financiado": MONTO_FINANCIADO,
-                                "id": depa.id
+                                "id": depa.id,
+                                "type": "proyecto"
                             })
                          
                             print(resu[proyecto.banco])
@@ -815,11 +817,76 @@ def getDepasAprobados(resultadoDepartamentos,valor_porcentaje_inicial,primera_vi
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
                             "monto_financiado": MONTO_FINANCIADO,
-                            "id": depa.id
+                            "id": depa.id,
+                            "type": "proyecto"
 
                         })
                         
                             print(depa)
+                            
+                            
+                            
+
+
+            departamentos_alquiler= Departamento_Alquiler.objects.filter(estatus="disponible")                
+
+                
+            for depa_alquiler in departamentos_alquiler:
+    
+                BONO= getBono(depa_alquiler.precio_venta, depa_alquiler.tipo_moneda, primera_vivienda)
+                MONTO_INICAL=getMontoIncial(depa_alquiler.precio_venta, depa_alquiler.tipo_moneda, cuota_inicial, valor_porcentaje_inicial_real)
+                MONTO_FINANCIADO = getMontoFinanciado(depa_alquiler.precio_venta,depa_alquiler.tipo_moneda,BONO, MONTO_INICAL)
+                
+                        
+                for resu in context:
+                            
+                    if  depa_alquiler.banco in resu and cuota_inicial>=MONTO_INICAL and float(resu[depa_alquiler.banco]) >=float(MONTO_FINANCIADO) :
+                        precio= depa_alquiler.precio_venta*3.8 if depa_alquiler.tipo_moneda =="usd" else depa_alquiler.precio_venta
+                        sumatoria=cuota_inicial+BONO+float(resu[depa_alquiler.banco])
+                        resultadoDepartamentos.append({
+                            "nro_depa":depa_alquiler.nro_depa,
+                            "proyecto":depa_alquiler.nombre,
+                            "precio": depa_alquiler.precio_venta,
+                            "tipo_moneda": depa_alquiler.tipo_moneda,
+                            "cuota_inicial": cuota_inicial,
+                            "max_financiamiento": resu[depa_alquiler.banco],
+                            "precio_real": depa_alquiler.precio_venta*3.8 if depa_alquiler.tipo_moneda =="usd" else depa_alquiler.precio_venta ,
+                            "porcentaje": sumatoria/precio,
+                            "bono": BONO,
+                            "monto_inicial": MONTO_INICAL ,
+                            "monto_financiado": MONTO_FINANCIADO,
+                            "id": depa_alquiler.id,
+                            "type": "alquiler"
+                        })
+                        
+                        
+
+
+                    
+                if  depa_alquiler.banco=="todos" and cuota_inicial>=MONTO_INICAL:
+
+                    if float(max(min_value)) >= float(MONTO_FINANCIADO):
+                        precio2=depa_alquiler.precio_venta*3.8 if depa_alquiler.tipo_moneda =="usd" else depa_alquiler.precio_venta
+                        sumatoria2=cuota_inicial+BONO+float(max(min_value))                            
+                        resultadoDepartamentos.append({
+                        "nro_depa":depa_alquiler.nro_depa,
+                        "proyecto":depa_alquiler.nombre,
+                        "precio": depa_alquiler.precio_venta,
+                        "tipo_moneda": depa_alquiler.tipo_moneda,
+                        "cuota_inicial": cuota_inicial,
+                        "max_financiamiento": float(max(min_value))  ,
+
+                        "precio_real": depa_alquiler.precio_venta*3.8 if depa_alquiler.tipo_moneda =="usd" else depa_alquiler.precio_venta ,
+                        "porcentaje": sumatoria2/precio2,
+                        "bono": BONO,
+                        "monto_inicial": MONTO_INICAL,
+                        "monto_financiado": MONTO_FINANCIADO,
+                        "id": depa_alquiler.id,
+                        "type": "alquiler"
+
+                    })
+                    
+                        print(depa_alquiler)
                             
             return resultadoDepartamentos
         
@@ -864,7 +931,8 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
                                 "bono": BONO,
                                 "monto_inicial": MONTO_INICAL,
                                 "monto_financiado": MONTO_FINANCIADO,
-                                "id": depa.id
+                                "id": depa.id,
+                                "type": "proyecto"
                             })
                          
                             print(resu[proyecto.banco])
@@ -890,11 +958,75 @@ def getAllDepartamentos(resultado_all_departamentos,valor_porcentaje_inicial,pri
                             "bono": BONO,
                             "monto_inicial": MONTO_INICAL,
                             "monto_financiado": MONTO_FINANCIADO,
-                            "id": depa.id
+                            "id": depa.id,
+                            "type": "proyecto"
 
                         })
                         
                             print(depa)
+                            
+                            
+            departamentos_alquiler= Departamento_Alquiler.objects.filter(estatus="disponible")                
+
+                
+            for depa_alquiler in departamentos_alquiler:
+
+                BONO= getBono(depa_alquiler.precio_venta, depa_alquiler.tipo_moneda, primera_vivienda)
+                MONTO_INICAL=getMontoIncial(depa_alquiler.precio_venta, depa_alquiler.tipo_moneda, cuota_inicial, valor_porcentaje_inicial_real)
+                MONTO_FINANCIADO = getMontoFinanciado(depa_alquiler.precio_venta,depa_alquiler.tipo_moneda,BONO, MONTO_INICAL)
+                
+                    
+                for resu in context:
+                        
+                    if  depa_alquiler.banco in resu :
+                        
+                        precio=depa_alquiler.precio_venta*3.8 if depa_alquiler.tipo_moneda =="usd" else depa_alquiler.precio_venta 
+                        sumatoria=cuota_inicial+BONO+float(resu[depa_alquiler.banco])
+                    
+                        resultado_all_departamentos.append({
+                            "nro_depa":depa_alquiler.nro_depa,
+                            "proyecto":depa_alquiler.nombre,
+                            "precio": depa_alquiler.precio_venta,
+                            "tipo_moneda": depa_alquiler.tipo_moneda,
+                            "cuota_inicial": cuota_inicial,
+                            "max_financiamiento": float(resu[depa_alquiler.banco])  ,
+
+                            "precio_real": precio ,
+                            "porcentaje": sumatoria/precio,
+                            "bono": BONO,
+                            "monto_inicial": MONTO_INICAL,
+                            "monto_financiado": MONTO_FINANCIADO,
+                            "id": depa_alquiler.id,
+                            "type": "alquiler"
+                        })
+                    
+                        print(resu[depa_alquiler.banco])
+                        
+
+
+                    
+                if  depa_alquiler.banco=="todos":
+
+                    # if float(min_value[0]) >= float(MONTO_FINANCIADO):
+                        precio2=depa_alquiler.precio_venta*3.8 if depa_alquiler.tipo_moneda =="usd" else depa_alquiler.precio_venta 
+                        sumatoria2=cuota_inicial+BONO+float(max(min_value))
+                        resultado_all_departamentos.append({
+                        "nro_depa":depa_alquiler.nro_depa,
+                        "proyecto":depa_alquiler.nombre,
+                        "precio": depa_alquiler.precio_venta,
+                        "tipo_moneda": depa_alquiler.tipo_moneda,
+                        "cuota_inicial": cuota_inicial,
+                        "max_financiamiento": float(max(min_value))  ,
+
+                        "precio_real": depa_alquiler.precio_venta*3.8 if depa_alquiler.tipo_moneda =="usd" else depa_alquiler.precio_venta ,
+                        "porcentaje": sumatoria2/precio2,
+                        "bono": BONO,
+                        "monto_inicial": MONTO_INICAL,
+                        "monto_financiado": MONTO_FINANCIADO,
+                        "id": depa_alquiler.id,
+                        "type": "alquiler"
+
+                    })
                             
             return resultado_all_departamentos
         
@@ -939,7 +1071,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa,
         "inicial_porc": porcentajeInicial if porcentajeInicial >= departamento.proyecto.valor_porcentaje_inicial*100 else departamento.proyecto.valor_porcentaje_inicial*100 , #update
         "fecha_entrega":  date.today().replace(day=1)  if departamento.proyecto.etapa =="inmediata"  else  departamento.proyecto.fecha_entrega,
         "alcabala": 'no',
-        "apreciacion_anual_porc": 2,
+        "apreciacion_anual_porc": 3,
         "costo_administracion_porc": 0,
         "meses_de_gracia": 0,
         "renta_mensual": departamento.valor_alquiler,
@@ -954,7 +1086,7 @@ def info_departamento_proyecto_analyzer(reques, idDepartamento, idCliente, tasa,
         "nro_habitaciones": departamento.nro_dormitorios,
         "nro_banos": departamento.nro_banos,
         "url": "https://proyects-image.s3.us-east-2.amazonaws.com/" + departamento.proyecto.slug + "/tipologias/" + departamento.tipo_departamento.upper() + ".jpg",
-        
+        "brochure": departamento.proyecto.link_brochure,
         "nro_depa": departamento.nro_depa,
 
         "corretaje": 'si' if analyzer.corretaje else "no",

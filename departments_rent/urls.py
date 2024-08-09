@@ -1,8 +1,7 @@
-
-
 from django.urls import path, register_converter
-from . import views
 
+from departments.images import delete_image_view, upload_image_view
+from . import views
 class FloatConverter:
     regex = r'\d+(\.\d+)?'
 
@@ -16,5 +15,8 @@ register_converter(FloatConverter, 'float')
 # get_project_by_name
 urlpatterns = [
     path('create-update/', views.upload_data_department_rent, name="upload_data_department"),
-
+    path('info_departamento_proyecto_analyzer/<str:idDepartamento>/<uuid:idCliente>/<float:tasa>/<float:plazoMeses>/<float:porcentajeInicial>/',
+        views.info_departamento_proyecto_analyzer,
+        name="info_departamento_proyecto"
+    ),
 ]

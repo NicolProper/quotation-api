@@ -1,6 +1,7 @@
 import json
 from django.http import JsonResponse
 from django.shortcuts import render
+import pandas as pd
 from rest_framework import viewsets
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
@@ -29,6 +30,7 @@ def save_cotizacion(fecha, asesor, correo_asesor,cliente, dni, proyecto, proyect
 
     return nueva_cotizacion
 
+                # proyecto =  row['proyecto'].lower() if not pd.isna(row['proyecto']) else None
 
 # usuario/views.py
 @api_view(['POST'])
@@ -42,11 +44,13 @@ def crear_cotizacion(request):
         correo_asesor=data.get('correo_asesor')
         cliente=data.get('cliente')
         dni= data.get('dni') 
-        proyecto=Proyecto.objects.get(id=data.get('proyecto'))
+        proyecto=None
+        # proyecto=Proyecto.objects.get(id=data.get('proyecto')) if data.get('proyecto')!=0 else None
         proyecto_nombre=data.get('proyecto_nombre')
-        departamento=Departamento.objects.get(id=data.get('departamento'))
+        # departamento=Departamento.objects.get(id=data.get('departamento')) if not data.get('departamento')!=0 else None
         departamento_nro=data.get('departamento_nro')
-        
+        departamento=None
+        print(fecha, asesor, correo_asesor,cliente, dni, proyecto, proyecto_nombre, departamento, departamento_nro)
 
         try:
             cotizacion_creada = save_cotizacion(fecha, asesor, correo_asesor,cliente, dni, proyecto, proyecto_nombre, departamento, departamento_nro)
